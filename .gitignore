@@ -1,2 +1,6 @@
 /HRM-Server/build/
 /HRM-Common/build/
+.DS_Store
+.DS_Store
+*/dist/*
+*/nbproject/private/*
