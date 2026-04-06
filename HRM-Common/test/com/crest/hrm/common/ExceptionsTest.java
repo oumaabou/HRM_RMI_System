@@ -23,17 +23,17 @@ public class ExceptionsTest {
     // =========================================================================
     @Test
     public void testEmployeeNotFoundException_Message() {
-        EmployeeNotFoundException ex = new EmployeeNotFoundException("EMP001");
-        assertTrue(ex.getMessage().contains("EMP001"));
+        EmployeeNotFoundException ex = new EmployeeNotFoundException(1);
+        assertTrue(ex.getMessage().contains("1"));
     }
     @Test
     public void testEmployeeNotFoundException_Identifier() {
-        EmployeeNotFoundException ex = new EmployeeNotFoundException("EMP001");
-        assertEquals("EMP001", ex.getIdentifier());
+        EmployeeNotFoundException ex = new EmployeeNotFoundException(1);
+        assertEquals(Integer.valueOf(1), ex.getIdentifier());
     }
     @Test
     public void testEmployeeNotFoundException_IsException() {
-        EmployeeNotFoundException ex = new EmployeeNotFoundException("EMP999");
+        EmployeeNotFoundException ex = new EmployeeNotFoundException(999);
         assertTrue(ex instanceof Exception);
     }
     // =========================================================================
@@ -84,4 +84,3 @@ public class ExceptionsTest {
         assertEquals(ic, ex.getIcNumber());
     }
 }
-

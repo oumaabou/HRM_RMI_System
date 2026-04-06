@@ -44,13 +44,13 @@ public class ModelsTest {
     @Test
     public void testEmployee_Constructor_And_Getters() {
         Employee emp = new Employee(
-                "EMP001", "Ali", "Hassan", "990101-14-1234",
+                1, "Ali", "Hassan", "990101-14-1234",
                 "ali@crestsolutions.com", "012-3456789",
                 "Software Engineer", Department.INFORMATION_TECHNOLOGY,
                 UserRole.EMPLOYEE, LocalDate.of(2020, 3, 1),
                 "ali.hassan", "hashed_password"
         );
-        assertEquals("EMP001", emp.getEmployeeId());
+        assertEquals(Integer.valueOf(1), emp.getEmployeeId());
         assertEquals("Ali", emp.getFirstName());
         assertEquals("Hassan", emp.getLastName());
         assertEquals("990101-14-1234", emp.getIcNumber());
@@ -68,11 +68,11 @@ public class ModelsTest {
     @Test
     public void testEmployee_Setters() {
         Employee emp = new Employee();
-        emp.setEmployeeId("EMP002");
+        emp.setEmployeeId(2);
         emp.setEmail("test@email.com");
         emp.setRole(UserRole.HR_STAFF);
         emp.setDepartment(Department.HUMAN_RESOURCES);
-        assertEquals("EMP002", emp.getEmployeeId());
+        assertEquals(Integer.valueOf(2), emp.getEmployeeId());
         assertEquals("test@email.com", emp.getEmail());
         assertEquals(UserRole.HR_STAFF, emp.getRole());
         assertEquals(Department.HUMAN_RESOURCES, emp.getDepartment());
@@ -80,7 +80,7 @@ public class ModelsTest {
     @Test
     public void testEmployee_Serialization() throws IOException, ClassNotFoundException {
         Employee emp = new Employee(
-                "EMP003", "Ravi", "Kumar", "880505-10-5678",
+                3, "Ravi", "Kumar", "880505-10-5678",
                 "ravi@crestsolutions.com", "011-9876543",
                 "HR Manager", Department.HUMAN_RESOURCES,
                 UserRole.HR_STAFF, LocalDate.of(2018, 6, 15),
@@ -94,7 +94,7 @@ public class ModelsTest {
     @Test
     public void testEmployee_ToString_NotEmpty() {
         Employee emp = new Employee(
-                "EMP004", "John", "Doe", "010203-05-1111",
+                4, "John", "Doe", "010203-05-1111",
                 "john@email.com", "013-1111111",
                 "Analyst", Department.FINANCE,
                 UserRole.EMPLOYEE, LocalDate.now(),
@@ -109,7 +109,7 @@ public class ModelsTest {
     @Test
     public void testLeaveApplication_DefaultStatus_IsPending() {
         LeaveApplication app = new LeaveApplication(
-                "LV001", "EMP001", LeaveType.ANNUAL,
+                "LV001", 1, LeaveType.ANNUAL,
                 LocalDate.of(2026, 5, 1), LocalDate.of(2026, 5, 5),
                 "Family vacation"
         );
@@ -118,7 +118,7 @@ public class ModelsTest {
     @Test
     public void testLeaveApplication_TotalDaysCalculation() {
         LeaveApplication app = new LeaveApplication(
-                "LV002", "EMP001", LeaveType.SICK,
+                "LV002", 1, LeaveType.SICK,
                 LocalDate.of(2026, 4, 10), LocalDate.of(2026, 4, 14),
                 "Fever"
         );
@@ -128,7 +128,7 @@ public class ModelsTest {
     @Test
     public void testLeaveApplication_SingleDay() {
         LeaveApplication app = new LeaveApplication(
-                "LV003", "EMP002", LeaveType.EMERGENCY,
+                "LV003", 2, LeaveType.EMERGENCY,
                 LocalDate.of(2026, 6, 1), LocalDate.of(2026, 6, 1),
                 "Emergency"
         );
@@ -137,7 +137,7 @@ public class ModelsTest {
     @Test
     public void testLeaveApplication_AppliedDate_IsToday() {
         LeaveApplication app = new LeaveApplication(
-                "LV004", "EMP001", LeaveType.ANNUAL,
+                "LV004", 1, LeaveType.ANNUAL,
                 LocalDate.of(2026, 7, 1), LocalDate.of(2026, 7, 3),
                 "Rest"
         );
@@ -146,7 +146,7 @@ public class ModelsTest {
     @Test
     public void testLeaveApplication_Serialization() throws IOException, ClassNotFoundException {
         LeaveApplication app = new LeaveApplication(
-                "LV005", "EMP001", LeaveType.ANNUAL,
+                "LV005", 1, LeaveType.ANNUAL,
                 LocalDate.of(2026, 8, 1), LocalDate.of(2026, 8, 7),
                 "Holiday"
         );
@@ -158,36 +158,36 @@ public class ModelsTest {
     @Test
     public void testLeaveApplication_StatusChange() {
         LeaveApplication app = new LeaveApplication(
-                "LV006", "EMP001", LeaveType.ANNUAL,
+                "LV006", 1, LeaveType.ANNUAL,
                 LocalDate.of(2026, 9, 1), LocalDate.of(2026, 9, 3),
                 "Vacation"
         );
         app.setStatus(LeaveStatus.APPROVED);
-        app.setReviewedBy("HR001");
+        app.setReviewedBy(101);
         app.setReviewRemarks("Approved");
         assertEquals(LeaveStatus.APPROVED, app.getStatus());
-        assertEquals("HR001", app.getReviewedBy());
+        assertEquals(Integer.valueOf(101), app.getReviewedBy());
     }
     // =========================================================================
     // LeaveBalance Tests
     // =========================================================================
     @Test
     public void testLeaveBalance_DefaultEntitlements() {
-        LeaveBalance balance = new LeaveBalance("EMP001", 2026);
+        LeaveBalance balance = new LeaveBalance(1, 2026);
         assertEquals(14, balance.getAnnualLeaveEntitlement());
         assertEquals(14, balance.getSickLeaveEntitlement());
         assertEquals(3,  balance.getEmergencyLeaveEntitlement());
     }
     @Test
     public void testLeaveBalance_RemainingDays_InitiallyFullBalance() {
-        LeaveBalance balance = new LeaveBalance("EMP001", 2026);
+        LeaveBalance balance = new LeaveBalance(1, 2026);
         assertEquals(14, balance.getRemainingAnnualLeave());
         assertEquals(14, balance.getRemainingSickLeave());
         assertEquals(3,  balance.getRemainingEmergencyLeave());
     }
     @Test
     public void testLeaveBalance_RemainingDays_AfterTaking() {
-        LeaveBalance balance = new LeaveBalance("EMP001", 2026);
+        LeaveBalance balance = new LeaveBalance(1, 2026);
         balance.setAnnualLeaveTaken(5);
         balance.setSickLeaveTaken(2);
         assertEquals(9, balance.getRemainingAnnualLeave());
@@ -195,7 +195,7 @@ public class ModelsTest {
     }
     @Test
     public void testLeaveBalance_Serialization() throws IOException, ClassNotFoundException {
-        LeaveBalance balance = new LeaveBalance("EMP002", 2026);
+        LeaveBalance balance = new LeaveBalance(2, 2026);
         balance.setAnnualLeaveTaken(3);
         LeaveBalance deserialized = serializeAndDeserialize(balance);
         assertEquals(balance.getEmployeeId(), deserialized.getEmployeeId());
@@ -207,12 +207,12 @@ public class ModelsTest {
     // =========================================================================
     @Test
     public void testFamilyDetails_Constructor() {
-        FamilyDetails fd = new FamilyDetails("EMP001");
-        assertEquals("EMP001", fd.getEmployeeId());
+        FamilyDetails fd = new FamilyDetails(1);
+        assertEquals(Integer.valueOf(1), fd.getEmployeeId());
     }
     @Test
     public void testFamilyDetails_Setters_And_Getters() {
-        FamilyDetails fd = new FamilyDetails("EMP001");
+        FamilyDetails fd = new FamilyDetails(1);
         fd.setSpouseName("Nurul Ain");
         fd.setNumberOfChildren(2);
         fd.setEmergencyContactName("Ahmad");
@@ -227,7 +227,7 @@ public class ModelsTest {
     }
     @Test
     public void testFamilyDetails_Serialization() throws IOException, ClassNotFoundException {
-        FamilyDetails fd = new FamilyDetails("EMP003");
+        FamilyDetails fd = new FamilyDetails(3);
         fd.setSpouseName("Sarah");
         fd.setNumberOfChildren(1);
         FamilyDetails deserialized = serializeAndDeserialize(fd);
@@ -237,7 +237,7 @@ public class ModelsTest {
     }
     @Test
     public void testFamilyDetails_ToString_NotEmpty() {
-        FamilyDetails fd = new FamilyDetails("EMP001");
+        FamilyDetails fd = new FamilyDetails(1);
         fd.setSpouseName("Maria");
         fd.setEmergencyContactName("John");
         fd.setEmergencyContactRelationship("Father");
@@ -245,4 +245,3 @@ public class ModelsTest {
         assertFalse(fd.toString().isEmpty());
     }
 }
-

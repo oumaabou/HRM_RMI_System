@@ -18,7 +18,7 @@ import java.time.LocalDate;
  */
 public class Employee implements Serializable {
     private static final long serialVersionUID = 1L;
-    private String employeeId;
+    private Integer employeeId;
     private String firstName;
     private String lastName;
     private String icNumber;       // IC or Passport number
@@ -34,7 +34,7 @@ public class Employee implements Serializable {
     // Constructors
     // -------------------------------------------------------------------------
     public Employee() {}
-    public Employee(String employeeId, String firstName, String lastName,
+    public Employee(Integer employeeId, String firstName, String lastName,
                     String icNumber, String email, String phoneNumber,
                     String position, Department department, UserRole role,
                     LocalDate dateJoined, String username, String passwordHash) {
@@ -54,8 +54,8 @@ public class Employee implements Serializable {
     // -------------------------------------------------------------------------
     // Getters & Setters
     // -------------------------------------------------------------------------
-    public String getEmployeeId()              { return employeeId; }
-    public void   setEmployeeId(String v)      { this.employeeId = v; }
+    public Integer getEmployeeId()             { return employeeId; }
+    public void   setEmployeeId(Integer v)     { this.employeeId = v; }
     public String getFirstName()               { return firstName; }
     public void   setFirstName(String v)       { this.firstName = v; }
     public String getLastName()                { return lastName; }
@@ -89,4 +89,3 @@ public class Employee implements Serializable {
         return "[" + employeeId + "] " + getFullName() + " (" + role + ") - " + department;
     }
 }
-

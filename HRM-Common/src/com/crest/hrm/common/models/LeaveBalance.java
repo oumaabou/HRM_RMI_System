@@ -15,7 +15,7 @@ import java.io.Serializable;
  */
 public class LeaveBalance implements Serializable {
     private static final long serialVersionUID = 1L;
-    private String employeeId;
+    private Integer employeeId;
     private int year;
     // Leave entitlements (days granted per year)
     private int annualLeaveEntitlement;
@@ -33,7 +33,7 @@ public class LeaveBalance implements Serializable {
     // Constructors
     // -------------------------------------------------------------------------
     public LeaveBalance() {}
-    public LeaveBalance(String employeeId, int year) {
+    public LeaveBalance(Integer employeeId, int year) {
         this.employeeId = employeeId;
         this.year       = year;
         // Default entitlements (Malaysian Labour Law standard)
@@ -54,8 +54,8 @@ public class LeaveBalance implements Serializable {
     // -------------------------------------------------------------------------
     // Getters & Setters
     // -------------------------------------------------------------------------
-    public String getEmployeeId()                   { return employeeId; }
-    public void   setEmployeeId(String v)           { this.employeeId = v; }
+    public Integer getEmployeeId()                  { return employeeId; }
+    public void   setEmployeeId(Integer v)          { this.employeeId = v; }
     public int  getYear()                           { return year; }
     public void setYear(int v)                      { this.year = v; }
     public int  getAnnualLeaveEntitlement()         { return annualLeaveEntitlement; }
@@ -85,4 +85,3 @@ public class LeaveBalance implements Serializable {
                "Sick: " + getRemainingSickLeave() + "/" + sickLeaveEntitlement;
     }
 }
-

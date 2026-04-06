@@ -19,7 +19,7 @@ import java.time.LocalDate;
 public class LeaveApplication implements Serializable {
     private static final long serialVersionUID = 1L;
     private String leaveId;
-    private String employeeId;
+    private Integer employeeId;
     private LeaveType leaveType;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -27,13 +27,13 @@ public class LeaveApplication implements Serializable {
     private String reason;
     private LeaveStatus status;
     private LocalDate appliedDate;
-    private String reviewedBy;        // Employee ID of HR who approved/rejected
+    private Integer reviewedBy;        // Employee ID of HR who approved/rejected
     private String reviewRemarks;
     // -------------------------------------------------------------------------
     // Constructors
     // -------------------------------------------------------------------------
     public LeaveApplication() {}
-    public LeaveApplication(String leaveId, String employeeId,
+    public LeaveApplication(String leaveId, Integer employeeId,
                             LeaveType leaveType, LocalDate startDate,
                             LocalDate endDate, String reason) {
         this.leaveId     = leaveId;
@@ -58,8 +58,8 @@ public class LeaveApplication implements Serializable {
     // -------------------------------------------------------------------------
     public String getLeaveId()                      { return leaveId; }
     public void   setLeaveId(String v)              { this.leaveId = v; }
-    public String getEmployeeId()                   { return employeeId; }
-    public void   setEmployeeId(String v)           { this.employeeId = v; }
+    public Integer getEmployeeId()                  { return employeeId; }
+    public void   setEmployeeId(Integer v)          { this.employeeId = v; }
     public LeaveType getLeaveType()                 { return leaveType; }
     public void      setLeaveType(LeaveType v)      { this.leaveType = v; }
     public LocalDate getStartDate()                 { return startDate; }
@@ -74,8 +74,8 @@ public class LeaveApplication implements Serializable {
     public void        setStatus(LeaveStatus v)     { this.status = v; }
     public LocalDate getAppliedDate()               { return appliedDate; }
     public void      setAppliedDate(LocalDate v)    { this.appliedDate = v; }
-    public String getReviewedBy()                   { return reviewedBy; }
-    public void   setReviewedBy(String v)           { this.reviewedBy = v; }
+    public Integer getReviewedBy()                  { return reviewedBy; }
+    public void   setReviewedBy(Integer v)          { this.reviewedBy = v; }
     public String getReviewRemarks()                { return reviewRemarks; }
     public void   setReviewRemarks(String v)        { this.reviewRemarks = v; }
     @Override
@@ -84,4 +84,3 @@ public class LeaveApplication implements Serializable {
                startDate + " to " + endDate + " (" + totalDays + " days) | " + status;
     }
 }
-
