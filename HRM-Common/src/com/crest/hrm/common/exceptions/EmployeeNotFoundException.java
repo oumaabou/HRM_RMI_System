@@ -5,19 +5,18 @@
 package com.crest.hrm.common.exceptions;
 
 /**
- *
- * @author shuhaab
- */
-/**
- * Thrown when an employee with the given ID or IC number cannot be found.
+ * Exception thrown when an employee cannot be found in the database.
  */
 public class EmployeeNotFoundException extends Exception {
-    private final String identifier;
-    public EmployeeNotFoundException(String identifier) {
-        super("Employee not found: " + identifier);
+    
+    private final Integer identifier; // Changed from String to Integer
+
+    public EmployeeNotFoundException(Integer identifier) { // Changed parameter type
+        super("Employee not found with ID: " + identifier);
         this.identifier = identifier;
     }
-    public String getIdentifier() {
+
+    public Integer getIdentifier() { // Changed return type
         return identifier;
     }
 }

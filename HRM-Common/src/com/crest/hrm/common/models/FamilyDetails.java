@@ -15,7 +15,7 @@ import java.io.Serializable;
  */
 public class FamilyDetails implements Serializable {
     private static final long serialVersionUID = 1L;
-    private String employeeId;
+    private Integer employeeId;
     private String spouseName;
     private int    numberOfChildren;
     private String emergencyContactName;
@@ -26,14 +26,14 @@ public class FamilyDetails implements Serializable {
     // Constructors
     // -------------------------------------------------------------------------
     public FamilyDetails() {}
-    public FamilyDetails(String employeeId) {
+    public FamilyDetails(Integer employeeId) {
         this.employeeId = employeeId;
     }
     // -------------------------------------------------------------------------
     // Getters & Setters
     // -------------------------------------------------------------------------
-    public String getEmployeeId()                          { return employeeId; }
-    public void   setEmployeeId(String v)                  { this.employeeId = v; }
+    public Integer getEmployeeId()                         { return employeeId; }
+    public void   setEmployeeId(Integer v)                 { this.employeeId = v; }
     public String getSpouseName()                          { return spouseName; }
     public void   setSpouseName(String v)                  { this.spouseName = v; }
     public int  getNumberOfChildren()                      { return numberOfChildren; }
@@ -54,4 +54,3 @@ public class FamilyDetails implements Serializable {
                "Emergency: " + emergencyContactName + " (" + emergencyContactRelationship + ")";
     }
 }
-
