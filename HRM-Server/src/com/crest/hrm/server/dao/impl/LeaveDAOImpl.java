@@ -2,6 +2,8 @@ package com.crest.hrm.server.dao.impl;
 
 import com.crest.hrm.common.models.LeaveApplication;
 import com.crest.hrm.common.models.LeaveBalance;
+import com.crest.hrm.common.enums.LeaveStatus;
+import com.crest.hrm.common.enums.LeaveType;
 import com.crest.hrm.server.dao.LeaveDAO;
 import com.crest.hrm.server.dao.DatabaseConnection;
 import java.sql.*;
@@ -10,11 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * LeaveDAOImpl - Implementation of LeaveDAO interface
- * 
- * TODO: Complete this file after Member 2 fixes:
- *       1. LeaveApplication.leaveId from String to Integer
- *       2. LeaveBalance model to match database (annualRemaining, sickRemaining, emergencyRemaining)
+ * LeaveDAOImpl - Complete Implementation of LeaveDAO interface
  */
 public class LeaveDAOImpl implements LeaveDAO {
 
@@ -24,46 +22,119 @@ public class LeaveDAOImpl implements LeaveDAO {
     
     @Override
     public int saveLeave(LeaveApplication leave) throws SQLException {
-        // TODO: Implement after Member 2 fixes leaveId from String to Integer
-        // SQL: INSERT INTO leaves (employee_id, leave_type, start_date, end_date, total_days, reason, status, applied_date)
-        //      VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-        // Return generated leave_id
-        throw new UnsupportedOperationException("TODO: Implement after Member 2 fixes leaveId type");
+        String sql = "INSERT INTO leaves (employee_id, leave_type, start_date, end_date, total_days, reason, status, applied_date) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            
+            ps.setInt(1, leave.getEmployeeId());
+            ps.setString(2, leave.getLeaveType().toString());
+            ps.setDate(3, Date.valueOf(leave.getStartDate()));
+            ps.setDate(4, Date.valueOf(leave.getEndDate()));
+            ps.setDouble(5, leave.getTotalDays());
+            ps.setString(6, leave.getReason());
+            ps.setString(7, leave.getStatus().toString());
+            
+            int affectedRows = ps.executeUpdate();
+            
+            if (affectedRows == 0) {
+                throw new SQLException("Creating leave application failed, no rows affected.");
+            }
+            
+            try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int leaveId = generatedKeys.getInt(1);
+                    leave.setLeaveId(leaveId);
+                    return leaveId;
+                } else {
+                    throw new SQLException("Creating leave application failed, no ID obtained.");
+                }
+            }
+        }
     }
     
     @Override
     public LeaveApplication findLeaveById(int leaveId) throws SQLException {
-        // TODO: Implement after Member 2 fixes leaveId from String to Integer
-        // SQL: SELECT * FROM leaves WHERE leave_id = ?
-        throw new UnsupportedOperationException("TODO: Implement after Member 2 fixes leaveId type");
+        String sql = "SELECT * FROM leaves WHERE leave_id = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, leaveId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToLeaveApplication(rs);
+                }
+                return null;
+            }
+        }
     }
     
     @Override
     public List<LeaveApplication> findLeavesByEmployee(int employeeId) throws SQLException {
-        // TODO: Implement after Member 2 fixes leaveId from String to Integer
-        // SQL: SELECT * FROM leaves WHERE employee_id = ? ORDER BY start_date DESC
-        throw new UnsupportedOperationException("TODO: Implement after Member 2 fixes leaveId type");
+        String sql = "SELECT * FROM leaves WHERE employee_id = ? ORDER BY start_date DESC";
+        List<LeaveApplication> leaves = new ArrayList<>();
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, employeeId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    leaves.add(mapResultSetToLeaveApplication(rs));
+                }
+            }
+        }
+        return leaves;
     }
     
     @Override
     public List<LeaveApplication> findPendingLeaves() throws SQLException {
-        // TODO: Implement after Member 2 fixes leaveId from String to Integer
-        // SQL: SELECT * FROM leaves WHERE status = 'PENDING' ORDER BY applied_date
-        throw new UnsupportedOperationException("TODO: Implement after Member 2 fixes leaveId type");
+        String sql = "SELECT * FROM leaves WHERE status = 'PENDING' ORDER BY applied_date";
+        List<LeaveApplication> leaves = new ArrayList<>();
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                leaves.add(mapResultSetToLeaveApplication(rs));
+            }
+        }
+        return leaves;
     }
     
     @Override
     public boolean updateLeaveStatus(int leaveId, String status, int approvedBy) throws SQLException {
-        // TODO: Implement after Member 2 fixes
-        // SQL: UPDATE leaves SET status = ?, approved_by = ?, approval_date = CURRENT_TIMESTAMP WHERE leave_id = ?
-        throw new UnsupportedOperationException("TODO: Implement after Member 2 fixes");
+        String sql = "UPDATE leaves SET status = ?, approved_by = ?, approval_date = CURRENT_TIMESTAMP WHERE leave_id = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, status);
+            ps.setInt(2, approvedBy);
+            ps.setInt(3, leaveId);
+            
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        }
     }
     
     @Override
     public boolean cancelLeaveApplication(int leaveId) throws SQLException {
-        // TODO: Implement after Member 2 fixes
-        // SQL: UPDATE leaves SET status = 'CANCELLED' WHERE leave_id = ? AND status = 'PENDING'
-        throw new UnsupportedOperationException("TODO: Implement after Member 2 fixes");
+        String sql = "UPDATE leaves SET status = 'CANCELLED' WHERE leave_id = ? AND status = 'PENDING'";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, leaveId);
+            
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        }
     }
     
     // ========================================================================
@@ -72,34 +143,89 @@ public class LeaveDAOImpl implements LeaveDAO {
     
     @Override
     public LeaveBalance getLeaveBalance(int employeeId, int year) throws SQLException {
-        // TODO: Implement after Member 2 fixes LeaveBalance model to match database
-        // Database has: annual_remaining, sick_remaining, emergency_remaining
-        // SQL: SELECT * FROM leave_balance WHERE employee_id = ? AND leave_year = ?
-        throw new UnsupportedOperationException("TODO: Implement after Member 2 fixes LeaveBalance model");
+        String sql = "SELECT * FROM leave_balance WHERE employee_id = ? AND leave_year = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, employeeId);
+            ps.setInt(2, year);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToLeaveBalance(rs);
+                }
+                return null;
+            }
+        }
     }
     
     @Override
     public boolean updateLeaveBalance(int employeeId, int year, double daysUsed, String leaveType) throws SQLException {
-        // TODO: Implement after Member 2 fixes LeaveBalance model
-        // SQL: UPDATE leave_balance SET 
-        //      annual_remaining = annual_remaining - ? WHERE leave_type = 'ANNUAL'
-        //      (similar for SICK, EMERGENCY)
-        throw new UnsupportedOperationException("TODO: Implement after Member 2 fixes");
+        String columnName;
+        switch (leaveType.toUpperCase()) {
+            case "ANNUAL":
+                columnName = "annual_remaining";
+                break;
+            case "SICK":
+                columnName = "sick_remaining";
+                break;
+            case "EMERGENCY":
+                columnName = "emergency_remaining";
+                break;
+            default:
+                return false;
+        }
+        
+        String sql = "UPDATE leave_balance SET " + columnName + " = " + columnName + " - ? " +
+                     "WHERE employee_id = ? AND leave_year = ? AND " + columnName + " >= ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setDouble(1, daysUsed);
+            ps.setInt(2, employeeId);
+            ps.setInt(3, year);
+            ps.setDouble(4, daysUsed);
+            
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        }
     }
     
     @Override
     public boolean initializeLeaveBalance(int employeeId, int year) throws SQLException {
-        // TODO: Implement after Member 2 fixes LeaveBalance model
-        // SQL: INSERT INTO leave_balance (employee_id, leave_year, annual_remaining, sick_remaining, emergency_remaining)
-        //      VALUES (?, ?, 14, 14, 3)
-        throw new UnsupportedOperationException("TODO: Implement after Member 2 fixes");
+        String sql = "INSERT INTO leave_balance (employee_id, leave_year, annual_remaining, sick_remaining, emergency_remaining) " +
+                     "VALUES (?, ?, 14.0, 14.0, 3.0)";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, employeeId);
+            ps.setInt(2, year);
+            
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        }
     }
     
     @Override
     public boolean hasSufficientBalance(int employeeId, int year, double daysRequested, String leaveType) throws SQLException {
-        // TODO: Implement after Member 2 fixes LeaveBalance model
-        // Get balance, compare daysRequested to remaining days for leaveType
-        throw new UnsupportedOperationException("TODO: Implement after Member 2 fixes");
+        LeaveBalance balance = getLeaveBalance(employeeId, year);
+        if (balance == null) {
+            return false;
+        }
+        
+        switch (leaveType.toUpperCase()) {
+            case "ANNUAL":
+                return balance.getAnnualRemaining() >= daysRequested;
+            case "SICK":
+                return balance.getSickRemaining() >= daysRequested;
+            case "EMERGENCY":
+                return balance.getEmergencyRemaining() >= daysRequested;
+            default:
+                return false;
+        }
     }
     
     // ========================================================================
@@ -108,38 +234,121 @@ public class LeaveDAOImpl implements LeaveDAO {
     
     @Override
     public List<LeaveApplication> getYearlyReport(int year) throws SQLException {
-        // TODO: Implement after Member 2 fixes leaveId from String to Integer
-        // SQL: SELECT * FROM leaves WHERE YEAR(start_date) = ? OR YEAR(end_date) = ?
-        throw new UnsupportedOperationException("TODO: Implement after Member 2 fixes");
+        String sql = "SELECT * FROM leaves WHERE YEAR(start_date) = ? OR YEAR(end_date) = ? ORDER BY start_date";
+        List<LeaveApplication> leaves = new ArrayList<>();
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, year);
+            ps.setInt(2, year);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    leaves.add(mapResultSetToLeaveApplication(rs));
+                }
+            }
+        }
+        return leaves;
     }
     
     @Override
     public List<LeaveApplication> getEmployeeYearlyReport(int employeeId, int year) throws SQLException {
-        // TODO: Implement after Member 2 fixes leaveId from String to Integer
-        // SQL: SELECT * FROM leaves WHERE employee_id = ? AND (YEAR(start_date) = ? OR YEAR(end_date) = ?)
-        throw new UnsupportedOperationException("TODO: Implement after Member 2 fixes");
+        String sql = "SELECT * FROM leaves WHERE employee_id = ? AND (YEAR(start_date) = ? OR YEAR(end_date) = ?) ORDER BY start_date";
+        List<LeaveApplication> leaves = new ArrayList<>();
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, employeeId);
+            ps.setInt(2, year);
+            ps.setInt(3, year);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    leaves.add(mapResultSetToLeaveApplication(rs));
+                }
+            }
+        }
+        return leaves;
     }
     
     @Override
     public double getTotalLeaveDaysTaken(int employeeId, int year, String leaveType) throws SQLException {
-        // TODO: Implement after Member 2 fixes
-        // SQL: SELECT SUM(total_days) FROM leaves 
-        //      WHERE employee_id = ? AND status = 'APPROVED' 
-        //      AND YEAR(start_date) = ? AND (leave_type = ? OR ? IS NULL)
-        throw new UnsupportedOperationException("TODO: Implement after Member 2 fixes");
+        String sql;
+        if (leaveType == null || leaveType.isEmpty()) {
+            sql = "SELECT SUM(total_days) FROM leaves WHERE employee_id = ? AND status = 'APPROVED' AND YEAR(start_date) = ?";
+        } else {
+            sql = "SELECT SUM(total_days) FROM leaves WHERE employee_id = ? AND status = 'APPROVED' AND YEAR(start_date) = ? AND leave_type = ?";
+        }
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, employeeId);
+            ps.setInt(2, year);
+            if (leaveType != null && !leaveType.isEmpty()) {
+                ps.setString(3, leaveType);
+            }
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble(1);
+                }
+                return 0;
+            }
+        }
     }
     
     // ========================================================================
-    // HELPER METHODS (TODO when implementing)
+    // HELPER METHODS
     // ========================================================================
     
-    // private LeaveApplication mapResultSetToLeaveApplication(ResultSet rs) throws SQLException {
-    //     TODO: Map database row to LeaveApplication object
-    //     Requires leaveId as Integer from database
-    // }
+    private LeaveApplication mapResultSetToLeaveApplication(ResultSet rs) throws SQLException {
+        LeaveApplication leave = new LeaveApplication();
+        
+        leave.setLeaveId(rs.getInt("leave_id"));
+        leave.setEmployeeId(rs.getInt("employee_id"));
+        
+        String leaveTypeStr = rs.getString("leave_type");
+        if (leaveTypeStr != null) {
+            leave.setLeaveType(LeaveType.valueOf(leaveTypeStr));
+        }
+        
+        Date startDate = rs.getDate("start_date");
+        if (startDate != null) {
+            leave.setStartDate(startDate.toLocalDate());
+        }
+        
+        Date endDate = rs.getDate("end_date");
+        if (endDate != null) {
+            leave.setEndDate(endDate.toLocalDate());
+        }
+        
+        leave.setTotalDays(rs.getInt("total_days"));
+        leave.setReason(rs.getString("reason"));
+        
+        String statusStr = rs.getString("status");
+        if (statusStr != null) {
+            leave.setStatus(LeaveStatus.valueOf(statusStr));
+        }
+        
+        leave.setReviewedBy(rs.getInt("approved_by"));
+        leave.setAppliedDate(rs.getTimestamp("applied_date"));
+        
+        return leave;
+    }
     
-    // private LeaveBalance mapResultSetToLeaveBalance(ResultSet rs) throws SQLException {
-    //     TODO: Map database row to LeaveBalance object
-    //     Requires LeaveBalance model to match database
-    // }
+    private LeaveBalance mapResultSetToLeaveBalance(ResultSet rs) throws SQLException {
+        LeaveBalance balance = new LeaveBalance();
+        
+        balance.setBalanceId(rs.getInt("balance_id"));
+        balance.setEmployeeId(rs.getInt("employee_id"));
+        balance.setLeaveYear(rs.getInt("leave_year"));
+        balance.setAnnualRemaining(rs.getDouble("annual_remaining"));
+        balance.setSickRemaining(rs.getDouble("sick_remaining"));
+        balance.setEmergencyRemaining(rs.getDouble("emergency_remaining"));
+        
+        return balance;
+    }
 }
