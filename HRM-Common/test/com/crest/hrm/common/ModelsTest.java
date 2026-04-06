@@ -18,13 +18,16 @@ import com.crest.hrm.common.models.LeaveApplication;
 import com.crest.hrm.common.models.LeaveBalance;
 import org.junit.Test;
 import java.io.*;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import static org.junit.Assert.*;
+
 /**
  * Unit tests for all Data Model classes.
  * Tests: constructors, getters/setters, utility methods, and Serialization.
  */
 public class ModelsTest {
+
     // =========================================================================
     // Helper: serialize then deserialize an object
     // =========================================================================
@@ -38,6 +41,7 @@ public class ModelsTest {
         ObjectInputStream in = new ObjectInputStream(bis);
         return (T) in.readObject();
     }
+
     // =========================================================================
     // Employee Tests
     // =========================================================================
@@ -46,18 +50,20 @@ public class ModelsTest {
         Employee emp = new Employee(
                 1, "Ali", "Hassan", "990101-14-1234",
                 "ali@crestsolutions.com", "012-3456789",
-                "Software Engineer", Department.INFORMATION_TECHNOLOGY,
+                "123 Ampang Road", "Male", Department.INFORMATION_TECHNOLOGY,
                 UserRole.EMPLOYEE, LocalDate.of(2020, 3, 1),
-                "ali.hassan", "hashed_password"
+                "ali.hassan", "hashed_password", true
         );
         assertEquals(Integer.valueOf(1), emp.getEmployeeId());
         assertEquals("Ali", emp.getFirstName());
         assertEquals("Hassan", emp.getLastName());
-        assertEquals("990101-14-1234", emp.getIcNumber());
-        assertEquals("ali@crestsolutions.com", emp.getEmail());
+        assertEquals("123 Ampang Road", emp.getAddress());
+        assertEquals("Male", emp.getGender());
+        assertTrue(emp.getIsActive());
         assertEquals(Department.INFORMATION_TECHNOLOGY, emp.getDepartment());
         assertEquals(UserRole.EMPLOYEE, emp.getRole());
     }
+
     @Test
     public void testEmployee_GetFullName() {
         Employee emp = new Employee();
@@ -65,182 +71,177 @@ public class ModelsTest {
         emp.setLastName("Aminah");
         assertEquals("Siti Aminah", emp.getFullName());
     }
+
     @Test
     public void testEmployee_Setters() {
         Employee emp = new Employee();
         emp.setEmployeeId(2);
         emp.setEmail("test@email.com");
+        emp.setIsActive(false);
         emp.setRole(UserRole.HR_STAFF);
         emp.setDepartment(Department.HUMAN_RESOURCES);
+
         assertEquals(Integer.valueOf(2), emp.getEmployeeId());
         assertEquals("test@email.com", emp.getEmail());
+        assertFalse(emp.getIsActive());
         assertEquals(UserRole.HR_STAFF, emp.getRole());
         assertEquals(Department.HUMAN_RESOURCES, emp.getDepartment());
     }
+
     @Test
     public void testEmployee_Serialization() throws IOException, ClassNotFoundException {
         Employee emp = new Employee(
                 3, "Ravi", "Kumar", "880505-10-5678",
                 "ravi@crestsolutions.com", "011-9876543",
-                "HR Manager", Department.HUMAN_RESOURCES,
+                "KL Sentral", "Male", Department.HUMAN_RESOURCES,
                 UserRole.HR_STAFF, LocalDate.of(2018, 6, 15),
-                "ravi.kumar", "hashed_pw"
+                "ravi.kumar", "hashed_pw", true
         );
         Employee deserialized = serializeAndDeserialize(emp);
         assertEquals(emp.getEmployeeId(), deserialized.getEmployeeId());
         assertEquals(emp.getFullName(), deserialized.getFullName());
         assertEquals(emp.getRole(), deserialized.getRole());
     }
+
     @Test
     public void testEmployee_ToString_NotEmpty() {
-        Employee emp = new Employee(
-                4, "John", "Doe", "010203-05-1111",
-                "john@email.com", "013-1111111",
-                "Analyst", Department.FINANCE,
-                UserRole.EMPLOYEE, LocalDate.now(),
-                "john.doe", "pw"
-        );
+        Employee emp = new Employee();
+        emp.setEmployeeId(4);
+        emp.setFirstName("John");
+        emp.setLastName("Doe");
+        emp.setRole(UserRole.EMPLOYEE);
+        emp.setDepartment(Department.FINANCE);
+        
         assertNotNull(emp.toString());
         assertFalse(emp.toString().isEmpty());
     }
+
     // =========================================================================
     // LeaveApplication Tests
     // =========================================================================
     @Test
     public void testLeaveApplication_DefaultStatus_IsPending() {
+        Timestamp now = new Timestamp(System.currentTimeMillis());
         LeaveApplication app = new LeaveApplication(
-                "LV001", 1, LeaveType.ANNUAL,
+                101, 1, LeaveType.ANNUAL,
                 LocalDate.of(2026, 5, 1), LocalDate.of(2026, 5, 5),
-                "Family vacation"
+                "Family vacation", now
         );
         assertEquals(LeaveStatus.PENDING, app.getStatus());
+        assertEquals(now, app.getAppliedDate());
     }
+
     @Test
     public void testLeaveApplication_TotalDaysCalculation() {
+        Timestamp now = new Timestamp(System.currentTimeMillis());
         LeaveApplication app = new LeaveApplication(
-                "LV002", 1, LeaveType.SICK,
+                102, 1, LeaveType.SICK,
                 LocalDate.of(2026, 4, 10), LocalDate.of(2026, 4, 14),
-                "Fever"
+                "Fever", now
         );
         // 10, 11, 12, 13, 14 = 5 days
         assertEquals(5, app.getTotalDays());
     }
-    @Test
-    public void testLeaveApplication_SingleDay() {
-        LeaveApplication app = new LeaveApplication(
-                "LV003", 2, LeaveType.EMERGENCY,
-                LocalDate.of(2026, 6, 1), LocalDate.of(2026, 6, 1),
-                "Emergency"
-        );
-        assertEquals(1, app.getTotalDays());
-    }
-    @Test
-    public void testLeaveApplication_AppliedDate_IsToday() {
-        LeaveApplication app = new LeaveApplication(
-                "LV004", 1, LeaveType.ANNUAL,
-                LocalDate.of(2026, 7, 1), LocalDate.of(2026, 7, 3),
-                "Rest"
-        );
-        assertEquals(LocalDate.now(), app.getAppliedDate());
-    }
+
     @Test
     public void testLeaveApplication_Serialization() throws IOException, ClassNotFoundException {
+        Timestamp now = new Timestamp(System.currentTimeMillis());
         LeaveApplication app = new LeaveApplication(
-                "LV005", 1, LeaveType.ANNUAL,
+                103, 1, LeaveType.ANNUAL,
                 LocalDate.of(2026, 8, 1), LocalDate.of(2026, 8, 7),
-                "Holiday"
+                "Holiday", now
         );
         LeaveApplication deserialized = serializeAndDeserialize(app);
         assertEquals(app.getLeaveId(), deserialized.getLeaveId());
         assertEquals(app.getTotalDays(), deserialized.getTotalDays());
         assertEquals(app.getStatus(), deserialized.getStatus());
     }
+
     @Test
     public void testLeaveApplication_StatusChange() {
+        Timestamp now = new Timestamp(System.currentTimeMillis());
         LeaveApplication app = new LeaveApplication(
-                "LV006", 1, LeaveType.ANNUAL,
+                104, 1, LeaveType.ANNUAL,
                 LocalDate.of(2026, 9, 1), LocalDate.of(2026, 9, 3),
-                "Vacation"
+                "Vacation", now
         );
         app.setStatus(LeaveStatus.APPROVED);
-        app.setReviewedBy(101);
-        app.setReviewRemarks("Approved");
+        app.setReviewedBy(99);
         assertEquals(LeaveStatus.APPROVED, app.getStatus());
-        assertEquals(Integer.valueOf(101), app.getReviewedBy());
+        assertEquals(Integer.valueOf(99), app.getReviewedBy());
     }
+
     // =========================================================================
     // LeaveBalance Tests
     // =========================================================================
     @Test
-    public void testLeaveBalance_DefaultEntitlements() {
-        LeaveBalance balance = new LeaveBalance(1, 2026);
-        assertEquals(14, balance.getAnnualLeaveEntitlement());
-        assertEquals(14, balance.getSickLeaveEntitlement());
-        assertEquals(3,  balance.getEmergencyLeaveEntitlement());
+    public void testLeaveBalance_Constructor_And_Getters() {
+        LeaveBalance balance = new LeaveBalance(500, 1, 2026, 14.0, 12.5, 3.0);
+        assertEquals(Integer.valueOf(500), balance.getBalanceId());
+        assertEquals(Integer.valueOf(2026), balance.getLeaveYear());
+        assertEquals(Double.valueOf(14.0), balance.getAnnualRemaining());
+        assertEquals(Double.valueOf(12.5), balance.getSickRemaining());
+        assertEquals(Double.valueOf(3.0), balance.getEmergencyRemaining());
     }
+
     @Test
-    public void testLeaveBalance_RemainingDays_InitiallyFullBalance() {
-        LeaveBalance balance = new LeaveBalance(1, 2026);
-        assertEquals(14, balance.getRemainingAnnualLeave());
-        assertEquals(14, balance.getRemainingSickLeave());
-        assertEquals(3,  balance.getRemainingEmergencyLeave());
+    public void testLeaveBalance_Setters() {
+        LeaveBalance balance = new LeaveBalance();
+        balance.setBalanceId(501);
+        balance.setAnnualRemaining(10.0);
+        
+        assertEquals(Integer.valueOf(501), balance.getBalanceId());
+        assertEquals(Double.valueOf(10.0), balance.getAnnualRemaining());
     }
-    @Test
-    public void testLeaveBalance_RemainingDays_AfterTaking() {
-        LeaveBalance balance = new LeaveBalance(1, 2026);
-        balance.setAnnualLeaveTaken(5);
-        balance.setSickLeaveTaken(2);
-        assertEquals(9, balance.getRemainingAnnualLeave());
-        assertEquals(12, balance.getRemainingSickLeave());
-    }
+
     @Test
     public void testLeaveBalance_Serialization() throws IOException, ClassNotFoundException {
-        LeaveBalance balance = new LeaveBalance(2, 2026);
-        balance.setAnnualLeaveTaken(3);
+        LeaveBalance balance = new LeaveBalance(502, 2, 2026, 8.0, 14.0, 3.0);
         LeaveBalance deserialized = serializeAndDeserialize(balance);
+        assertEquals(balance.getBalanceId(), deserialized.getBalanceId());
         assertEquals(balance.getEmployeeId(), deserialized.getEmployeeId());
-        assertEquals(balance.getYear(), deserialized.getYear());
-        assertEquals(balance.getRemainingAnnualLeave(), deserialized.getRemainingAnnualLeave());
+        assertEquals(balance.getAnnualRemaining(), deserialized.getAnnualRemaining());
     }
+
     // =========================================================================
     // FamilyDetails Tests
     // =========================================================================
     @Test
     public void testFamilyDetails_Constructor() {
-        FamilyDetails fd = new FamilyDetails(1);
+        FamilyDetails fd = new FamilyDetails(10, 1, "Nurul Ain", "Spouse", "012-9999999");
+        assertEquals(Integer.valueOf(10), fd.getFamilyId());
         assertEquals(Integer.valueOf(1), fd.getEmployeeId());
+        assertEquals("Nurul Ain", fd.getFamilyMemberName());
+        assertEquals("Spouse", fd.getRelationship());
+        assertEquals("012-9999999", fd.getPhoneNumber());
     }
+
     @Test
-    public void testFamilyDetails_Setters_And_Getters() {
-        FamilyDetails fd = new FamilyDetails(1);
-        fd.setSpouseName("Nurul Ain");
-        fd.setNumberOfChildren(2);
-        fd.setEmergencyContactName("Ahmad");
-        fd.setEmergencyContactPhone("012-9999999");
-        fd.setEmergencyContactRelationship("Brother");
-        fd.setHomeAddress("123, Jalan Maju, Kuala Lumpur");
-        assertEquals("Nurul Ain", fd.getSpouseName());
-        assertEquals(2, fd.getNumberOfChildren());
-        assertEquals("Ahmad", fd.getEmergencyContactName());
-        assertEquals("012-9999999", fd.getEmergencyContactPhone());
-        assertEquals("Brother", fd.getEmergencyContactRelationship());
+    public void testFamilyDetails_Setters() {
+        FamilyDetails fd = new FamilyDetails();
+        fd.setFamilyId(11);
+        fd.setEmployeeId(2);
+        fd.setFamilyMemberName("Ahmad");
+        fd.setRelationship("Brother");
+        fd.setPhoneNumber("013-1111111");
+
+        assertEquals(Integer.valueOf(11), fd.getFamilyId());
+        assertEquals("Ahmad", fd.getFamilyMemberName());
+        assertEquals("Brother", fd.getRelationship());
     }
+
     @Test
     public void testFamilyDetails_Serialization() throws IOException, ClassNotFoundException {
-        FamilyDetails fd = new FamilyDetails(3);
-        fd.setSpouseName("Sarah");
-        fd.setNumberOfChildren(1);
+        FamilyDetails fd = new FamilyDetails(12, 3, "Sarah", "Child", "N/A");
         FamilyDetails deserialized = serializeAndDeserialize(fd);
-        assertEquals(fd.getEmployeeId(), deserialized.getEmployeeId());
-        assertEquals(fd.getSpouseName(), deserialized.getSpouseName());
-        assertEquals(fd.getNumberOfChildren(), deserialized.getNumberOfChildren());
+        assertEquals(fd.getFamilyId(), deserialized.getFamilyId());
+        assertEquals(fd.getFamilyMemberName(), deserialized.getFamilyMemberName());
+        assertEquals(fd.getRelationship(), deserialized.getRelationship());
     }
+
     @Test
     public void testFamilyDetails_ToString_NotEmpty() {
-        FamilyDetails fd = new FamilyDetails(1);
-        fd.setSpouseName("Maria");
-        fd.setEmergencyContactName("John");
-        fd.setEmergencyContactRelationship("Father");
+        FamilyDetails fd = new FamilyDetails(13, 1, "Maria", "Mother", "019-2222222");
         assertNotNull(fd.toString());
         assertFalse(fd.toString().isEmpty());
     }

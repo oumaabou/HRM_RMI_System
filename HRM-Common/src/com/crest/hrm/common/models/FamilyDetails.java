@@ -1,56 +1,40 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.crest.hrm.common.models;
 
-/**
- *
- * @author shuhaab
- */
 import java.io.Serializable;
-/**
- * Stores personal and family details for an employee.
- * Implements Serializable for RMI transmission.
- */
+
 public class FamilyDetails implements Serializable {
     private static final long serialVersionUID = 1L;
+    
+    private Integer familyId;
     private Integer employeeId;
-    private String spouseName;
-    private int    numberOfChildren;
-    private String emergencyContactName;
-    private String emergencyContactPhone;
-    private String emergencyContactRelationship;
-    private String homeAddress;
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
+    private String familyMemberName;
+    private String relationship;
+    private String phoneNumber;
+
     public FamilyDetails() {}
-    public FamilyDetails(Integer employeeId) {
+
+    public FamilyDetails(Integer familyId, Integer employeeId, String familyMemberName, 
+                         String relationship, String phoneNumber) {
+        this.familyId = familyId;
         this.employeeId = employeeId;
+        this.familyMemberName = familyMemberName;
+        this.relationship = relationship;
+        this.phoneNumber = phoneNumber;
     }
-    // -------------------------------------------------------------------------
-    // Getters & Setters
-    // -------------------------------------------------------------------------
-    public Integer getEmployeeId()                         { return employeeId; }
-    public void   setEmployeeId(Integer v)                 { this.employeeId = v; }
-    public String getSpouseName()                          { return spouseName; }
-    public void   setSpouseName(String v)                  { this.spouseName = v; }
-    public int  getNumberOfChildren()                      { return numberOfChildren; }
-    public void setNumberOfChildren(int v)                 { this.numberOfChildren = v; }
-    public String getEmergencyContactName()                { return emergencyContactName; }
-    public void   setEmergencyContactName(String v)        { this.emergencyContactName = v; }
-    public String getEmergencyContactPhone()               { return emergencyContactPhone; }
-    public void   setEmergencyContactPhone(String v)       { this.emergencyContactPhone = v; }
-    public String getEmergencyContactRelationship()        { return emergencyContactRelationship; }
-    public void   setEmergencyContactRelationship(String v){ this.emergencyContactRelationship = v; }
-    public String getHomeAddress()                         { return homeAddress; }
-    public void   setHomeAddress(String v)                 { this.homeAddress = v; }
+
+    public Integer getFamilyId()                    { return familyId; }
+    public void setFamilyId(Integer v)              { this.familyId = v; }
+    public Integer getEmployeeId()                  { return employeeId; }
+    public void setEmployeeId(Integer v)            { this.employeeId = v; }
+    public String getFamilyMemberName()             { return familyMemberName; }
+    public void setFamilyMemberName(String v)       { this.familyMemberName = v; }
+    public String getRelationship()                 { return relationship; }
+    public void setRelationship(String v)           { this.relationship = v; }
+    public String getPhoneNumber()                  { return phoneNumber; }
+    public void setPhoneNumber(String v)            { this.phoneNumber = v; }
+
     @Override
     public String toString() {
-        return "FamilyDetails [" + employeeId + "] " +
-               "Spouse: " + (spouseName != null ? spouseName : "N/A") + " | " +
-               "Children: " + numberOfChildren + " | " +
-               "Emergency: " + emergencyContactName + " (" + emergencyContactRelationship + ")";
+        return "FamilyMember [" + familyId + "] " + familyMemberName + " (" + relationship + ") - " + phoneNumber;
     }
 }
