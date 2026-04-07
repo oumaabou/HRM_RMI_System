@@ -4,3 +4,7 @@
 .DS_Store
 */dist/*
 */nbproject/private/*
+/HRM-Common/HRM-Common/nbproject/private/
+/HRM-Common/HRM-Common2/nbproject/private/
+/HRM-Common/HRM-Server/nbproject/private/
+/HRM-Common/HRM-Client/nbproject/private/
