@@ -29,12 +29,13 @@ public class LeaveDAOImpl implements LeaveDAO {
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
             ps.setInt(1, leave.getEmployeeId());
-            ps.setString(2, leave.getLeaveType().toString());
+            // Use .name() to get "ANNUAL" not "Annual Leave"
+            ps.setString(2, leave.getLeaveType().name());
             ps.setDate(3, Date.valueOf(leave.getStartDate()));
             ps.setDate(4, Date.valueOf(leave.getEndDate()));
             ps.setDouble(5, leave.getTotalDays());
             ps.setString(6, leave.getReason());
-            ps.setString(7, leave.getStatus().toString());
+            ps.setString(7, leave.getStatus().name());
             
             int affectedRows = ps.executeUpdate();
             
@@ -310,9 +311,37 @@ public class LeaveDAOImpl implements LeaveDAO {
         leave.setLeaveId(rs.getInt("leave_id"));
         leave.setEmployeeId(rs.getInt("employee_id"));
         
+        // Convert database string to enum (handle both formats)
         String leaveTypeStr = rs.getString("leave_type");
         if (leaveTypeStr != null) {
-            leave.setLeaveType(LeaveType.valueOf(leaveTypeStr));
+            switch (leaveTypeStr.toUpperCase()) {
+                case "ANNUAL":
+                case "ANNUAL LEAVE":
+                    leave.setLeaveType(LeaveType.ANNUAL);
+                    break;
+                case "SICK":
+                case "SICK LEAVE":
+                    leave.setLeaveType(LeaveType.SICK);
+                    break;
+                case "EMERGENCY":
+                case "EMERGENCY LEAVE":
+                    leave.setLeaveType(LeaveType.EMERGENCY);
+                    break;
+                case "MATERNITY":
+                case "MATERNITY LEAVE":
+                    leave.setLeaveType(LeaveType.MATERNITY);
+                    break;
+                case "PATERNITY":
+                case "PATERNITY LEAVE":
+                    leave.setLeaveType(LeaveType.PATERNITY);
+                    break;
+                case "UNPAID":
+                case "UNPAID LEAVE":
+                    leave.setLeaveType(LeaveType.UNPAID);
+                    break;
+                default:
+                    leave.setLeaveType(LeaveType.ANNUAL);
+            }
         }
         
         Date startDate = rs.getDate("start_date");
@@ -328,9 +357,25 @@ public class LeaveDAOImpl implements LeaveDAO {
         leave.setTotalDays(rs.getInt("total_days"));
         leave.setReason(rs.getString("reason"));
         
+        // Convert database string to enum
         String statusStr = rs.getString("status");
         if (statusStr != null) {
-            leave.setStatus(LeaveStatus.valueOf(statusStr));
+            switch (statusStr.toUpperCase()) {
+                case "PENDING":
+                    leave.setStatus(LeaveStatus.PENDING);
+                    break;
+                case "APPROVED":
+                    leave.setStatus(LeaveStatus.APPROVED);
+                    break;
+                case "REJECTED":
+                    leave.setStatus(LeaveStatus.REJECTED);
+                    break;
+                case "CANCELLED":
+                    leave.setStatus(LeaveStatus.CANCELLED);
+                    break;
+                default:
+                    leave.setStatus(LeaveStatus.PENDING);
+            }
         }
         
         leave.setReviewedBy(rs.getInt("approved_by"));

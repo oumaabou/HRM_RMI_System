@@ -4,19 +4,47 @@ import com.crest.hrm.server.dao.ReportDAO;
 import com.crest.hrm.server.dao.DatabaseConnection;
 import java.sql.*;
 import java.util.*;
-import java.sql.Date;
 
-/**
- * ReportDAOImpl - Complete Implementation of ReportDAO interface
- * 
- * Handles all report-related database queries for:
- * - Yearly leave reports for HR
- * - Employee-specific leave summaries
- * - Department reports
- * - Leave balance reports
- * - CSV/Excel export data
- */
 public class ReportDAOImpl implements ReportDAO {
+
+    // ========================================================================
+    // HELPER - Map ResultSet to LeaveReportRow
+    // ========================================================================
+    
+    private LeaveReportRow mapResultSetToLeaveReportRow(ResultSet rs) throws SQLException {
+        LeaveReportRow row = new LeaveReportRow();
+        
+        row.setLeaveId(rs.getInt("leave_id"));
+        row.setEmployeeId(rs.getInt("employee_id"));
+        row.setEmployeeName(rs.getString("employee_name"));
+        row.setDepartment(rs.getString("department"));
+        row.setLeaveType(rs.getString("leave_type"));
+        
+        java.sql.Date startDate = rs.getDate("start_date");
+        if (startDate != null) {
+            row.setStartDate(startDate.toString());
+        }
+        
+        java.sql.Date endDate = rs.getDate("end_date");
+        if (endDate != null) {
+            row.setEndDate(endDate.toString());
+        }
+        
+        row.setTotalDays(rs.getDouble("total_days"));
+        row.setReason(rs.getString("reason"));
+        row.setStatus(rs.getString("status"));
+        
+        // approved_by is INT in database, convert to String for display
+        int approvedBy = rs.getInt("approved_by");
+        row.setApprovedBy(approvedBy == 0 ? "" : String.valueOf(approvedBy));
+        
+        java.sql.Timestamp appliedDate = rs.getTimestamp("applied_date");
+        if (appliedDate != null) {
+            row.setAppliedDate(appliedDate.toString());
+        }
+        
+        return row;
+    }
 
     // ========================================================================
     // YEARLY LEAVE REPORTS
@@ -25,12 +53,10 @@ public class ReportDAOImpl implements ReportDAO {
     @Override
     public List<LeaveReportRow> getYearlyLeaveReport(int year) throws SQLException {
         String sql = "SELECT l.leave_id, l.employee_id, l.leave_type, l.start_date, l.end_date, " +
-                     "l.total_days, l.reason, l.status, l.applied_date, " +
-                     "CONCAT(e.first_name, ' ', e.last_name) as employee_name, e.department, " +
-                     "CONCAT(hr.first_name, ' ', hr.last_name) as approved_by_name " +
+                     "l.total_days, l.reason, l.status, l.applied_date, l.approved_by, " +
+                     "e.first_name || ' ' || e.last_name as employee_name, e.department " +
                      "FROM leaves l " +
                      "JOIN employees e ON l.employee_id = e.employee_id " +
-                     "LEFT JOIN employees hr ON l.approved_by = hr.employee_id " +
                      "WHERE YEAR(l.start_date) = ? OR YEAR(l.end_date) = ? " +
                      "ORDER BY l.start_date";
         
@@ -54,12 +80,10 @@ public class ReportDAOImpl implements ReportDAO {
     @Override
     public List<LeaveReportRow> getYearlyLeaveReportByDepartment(int year, String department) throws SQLException {
         String sql = "SELECT l.leave_id, l.employee_id, l.leave_type, l.start_date, l.end_date, " +
-                     "l.total_days, l.reason, l.status, l.applied_date, " +
-                     "CONCAT(e.first_name, ' ', e.last_name) as employee_name, e.department, " +
-                     "CONCAT(hr.first_name, ' ', hr.last_name) as approved_by_name " +
+                     "l.total_days, l.reason, l.status, l.applied_date, l.approved_by, " +
+                     "e.first_name || ' ' || e.last_name as employee_name, e.department " +
                      "FROM leaves l " +
                      "JOIN employees e ON l.employee_id = e.employee_id " +
-                     "LEFT JOIN employees hr ON l.approved_by = hr.employee_id " +
                      "WHERE (YEAR(l.start_date) = ? OR YEAR(l.end_date) = ?) AND e.department = ? " +
                      "ORDER BY l.start_date";
         
@@ -84,12 +108,10 @@ public class ReportDAOImpl implements ReportDAO {
     @Override
     public List<LeaveReportRow> getYearlyLeaveReportByStatus(int year, String status) throws SQLException {
         String sql = "SELECT l.leave_id, l.employee_id, l.leave_type, l.start_date, l.end_date, " +
-                     "l.total_days, l.reason, l.status, l.applied_date, " +
-                     "CONCAT(e.first_name, ' ', e.last_name) as employee_name, e.department, " +
-                     "CONCAT(hr.first_name, ' ', hr.last_name) as approved_by_name " +
+                     "l.total_days, l.reason, l.status, l.applied_date, l.approved_by, " +
+                     "e.first_name || ' ' || e.last_name as employee_name, e.department " +
                      "FROM leaves l " +
                      "JOIN employees e ON l.employee_id = e.employee_id " +
-                     "LEFT JOIN employees hr ON l.approved_by = hr.employee_id " +
                      "WHERE (YEAR(l.start_date) = ? OR YEAR(l.end_date) = ?) AND l.status = ? " +
                      "ORDER BY l.start_date";
         
@@ -118,12 +140,10 @@ public class ReportDAOImpl implements ReportDAO {
     @Override
     public List<LeaveReportRow> getEmployeeLeaveReport(int employeeId, int year) throws SQLException {
         String sql = "SELECT l.leave_id, l.employee_id, l.leave_type, l.start_date, l.end_date, " +
-                     "l.total_days, l.reason, l.status, l.applied_date, " +
-                     "CONCAT(e.first_name, ' ', e.last_name) as employee_name, e.department, " +
-                     "CONCAT(hr.first_name, ' ', hr.last_name) as approved_by_name " +
+                     "l.total_days, l.reason, l.status, l.applied_date, l.approved_by, " +
+                     "e.first_name || ' ' || e.last_name as employee_name, e.department " +
                      "FROM leaves l " +
                      "JOIN employees e ON l.employee_id = e.employee_id " +
-                     "LEFT JOIN employees hr ON l.approved_by = hr.employee_id " +
                      "WHERE l.employee_id = ? AND (YEAR(l.start_date) = ? OR YEAR(l.end_date) = ?) " +
                      "ORDER BY l.start_date";
         
@@ -149,7 +169,6 @@ public class ReportDAOImpl implements ReportDAO {
     public EmployeeLeaveSummary getEmployeeLeaveSummary(int employeeId, int year) throws SQLException {
         EmployeeLeaveSummary summary = new EmployeeLeaveSummary();
         
-        // Get employee basic info
         String empSql = "SELECT employee_id, first_name, last_name, department FROM employees WHERE employee_id = ?";
         
         try (Connection conn = DatabaseConnection.getConnection();
@@ -166,7 +185,6 @@ public class ReportDAOImpl implements ReportDAO {
             }
         }
         
-        // Get leave taken totals
         String leaveSql = "SELECT leave_type, SUM(total_days) as total FROM leaves " +
                           "WHERE employee_id = ? AND status = 'APPROVED' AND YEAR(start_date) = ? " +
                           "GROUP BY leave_type";
@@ -197,7 +215,6 @@ public class ReportDAOImpl implements ReportDAO {
             }
         }
         
-        // Get leave balance
         String balanceSql = "SELECT annual_remaining, sick_remaining, emergency_remaining FROM leave_balance " +
                             "WHERE employee_id = ? AND leave_year = ?";
         
@@ -216,7 +233,6 @@ public class ReportDAOImpl implements ReportDAO {
             }
         }
         
-        // Calculate total leave taken
         double total = summary.getAnnualLeaveTaken() + summary.getSickLeaveTaken() + summary.getEmergencyLeaveTaken();
         summary.setTotalLeaveTaken(total);
         
@@ -285,8 +301,7 @@ public class ReportDAOImpl implements ReportDAO {
     
     @Override
     public List<EmployeeLeaveSummary> getEmployeesWithLowBalance(int year, double threshold) throws SQLException {
-        String sql = "SELECT lb.employee_id, lb.annual_remaining, lb.sick_remaining, lb.emergency_remaining " +
-                     "FROM leave_balance lb " +
+        String sql = "SELECT lb.employee_id FROM leave_balance lb " +
                      "WHERE lb.leave_year = ? AND (lb.annual_remaining < ? OR lb.sick_remaining < ? OR lb.emergency_remaining < ?)";
         
         List<Integer> employeeIds = new ArrayList<>();
@@ -345,11 +360,9 @@ public class ReportDAOImpl implements ReportDAO {
         List<LeaveReportRow> reports = getYearlyLeaveReport(year);
         List<String[]> exportData = new ArrayList<>();
         
-        // Add header row
         exportData.add(new String[]{"Leave ID", "Employee Name", "Department", "Leave Type", 
                                     "Start Date", "End Date", "Total Days", "Reason", "Status", "Applied Date"});
         
-        // Add data rows
         for (LeaveReportRow row : reports) {
             exportData.add(new String[]{
                 String.valueOf(row.getLeaveId()),
@@ -371,13 +384,13 @@ public class ReportDAOImpl implements ReportDAO {
     @Override
     public List<String[]> getEmployeeHistoryForExport(int employeeId, Integer year) throws SQLException {
         List<LeaveReportRow> reports;
+        
         if (year != null) {
             reports = getEmployeeLeaveReport(employeeId, year);
         } else {
-            // Get all years
             String sql = "SELECT l.leave_id, l.employee_id, l.leave_type, l.start_date, l.end_date, " +
-                         "l.total_days, l.reason, l.status, l.applied_date, " +
-                         "CONCAT(e.first_name, ' ', e.last_name) as employee_name, e.department " +
+                         "l.total_days, l.reason, l.status, l.applied_date, l.approved_by, " +
+                         "e.first_name || ' ' || e.last_name as employee_name, e.department " +
                          "FROM leaves l " +
                          "JOIN employees e ON l.employee_id = e.employee_id " +
                          "WHERE l.employee_id = ? " +
@@ -400,11 +413,9 @@ public class ReportDAOImpl implements ReportDAO {
         
         List<String[]> exportData = new ArrayList<>();
         
-        // Add header row
         exportData.add(new String[]{"Leave ID", "Employee Name", "Department", "Leave Type", 
                                     "Start Date", "End Date", "Total Days", "Reason", "Status", "Applied Date"});
         
-        // Add data rows
         for (LeaveReportRow row : reports) {
             exportData.add(new String[]{
                 String.valueOf(row.getLeaveId()),
@@ -421,41 +432,5 @@ public class ReportDAOImpl implements ReportDAO {
         }
         
         return exportData;
-    }
-    
-    // ========================================================================
-    // HELPER METHODS
-    // ========================================================================
-    
-    private LeaveReportRow mapResultSetToLeaveReportRow(ResultSet rs) throws SQLException {
-        LeaveReportRow row = new LeaveReportRow();
-        
-        row.setLeaveId(rs.getInt("leave_id"));
-        row.setEmployeeId(rs.getInt("employee_id"));
-        row.setEmployeeName(rs.getString("employee_name"));
-        row.setDepartment(rs.getString("department"));
-        row.setLeaveType(rs.getString("leave_type"));
-        
-        Date startDate = rs.getDate("start_date");
-        if (startDate != null) {
-            row.setStartDate(startDate.toString());
-        }
-        
-        Date endDate = rs.getDate("end_date");
-        if (endDate != null) {
-            row.setEndDate(endDate.toString());
-        }
-        
-        row.setTotalDays(rs.getDouble("total_days"));
-        row.setReason(rs.getString("reason"));
-        row.setStatus(rs.getString("status"));
-        row.setApprovedBy(rs.getString("approved_by_name"));
-        
-        Timestamp appliedDate = rs.getTimestamp("applied_date");
-        if (appliedDate != null) {
-            row.setAppliedDate(appliedDate.toString());
-        }
-        
-        return row;
     }
 }
