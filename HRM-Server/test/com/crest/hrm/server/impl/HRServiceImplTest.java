@@ -1,13 +1,35 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.crest.hrm.server.impl;
 
-/**
- *
- * @author Malika
- */
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 public class HRServiceImplTest {
-    
+
+    private HRServiceImpl hrService;
+
+    @Before
+    public void setUp() throws Exception {
+        hrService = new HRServiceImpl();
+    }
+
+    @Test
+    public void testGetEmployeeInvalidId() {
+        try {
+            hrService.getEmployeeById("99999");
+            fail("Expected EmployeeNotFoundException");
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testGenerateReportInvalidEmployee() {
+        try {
+            hrService.generateYearlyLeaveReport("99999", 2025);
+            fail("Expected exception");
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+    }
 }

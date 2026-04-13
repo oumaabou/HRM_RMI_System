@@ -24,12 +24,12 @@ public class AuthServiceImplTest {
     }
 
     @Test
-    public void testLogoutInvalidToken() {
+    public void testLogoutInvalidEmployeeId() {
         try {
             authService.logout("invalid_token");
-            assertTrue(true); // if no crash → pass
-    }     catch (Exception e) {
-            fail("Logout should not throw exception");
+            fail("Expected exception for invalid employee ID");
+        } catch (Exception e) {
+            assertTrue(true);
+        }
     }
-}
 }
