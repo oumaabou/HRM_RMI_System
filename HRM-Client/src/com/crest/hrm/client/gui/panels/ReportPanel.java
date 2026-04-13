@@ -38,9 +38,12 @@ public class ReportPanel extends javax.swing.JPanel {
 
         jLabel2.setText("Year");
 
-        jTextField1.setText("jTextField1");
-
         jButton1.setText("Generate Report");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -94,6 +97,17 @@ public class ReportPanel extends javax.swing.JPanel {
                 .addContainerGap(130, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        if (com.crest.hrm.client.utils.FormValidator.isEmpty(jTextField1.getText())) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Please enter year");
+        return;
+    }
+
+    javax.swing.JOptionPane.showMessageDialog(this, "Report generated successfully");
+
+    jTextField1.setText("");
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

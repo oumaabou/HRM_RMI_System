@@ -100,14 +100,16 @@ public class LoginFrame extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
     String username = jTextField1.getText();
-String password = new String(jPasswordField1.getPassword());
+    String password = new String(jPasswordField1.getPassword());
 
-if(username.equals("admin") && password.equals("123")) {
-    new MainFrame().setVisible(true);
-    this.dispose();
-} else {
-    javax.swing.JOptionPane.showMessageDialog(this, "Invalid login");
-}
+    if (username.equals("admin") && password.equals("123")) {
+        com.crest.hrm.client.session.UserSession.username = username;
+        new MainFrame().setVisible(true);
+        this.dispose();
+    } else {
+        javax.swing.JOptionPane.showMessageDialog(this, "Invalid login");
+    }
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed

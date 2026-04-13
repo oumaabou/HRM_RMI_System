@@ -45,6 +45,11 @@ public class EmployeeRegistrationPanel extends javax.swing.JPanel {
         jLabel4.setText("IC/Passport");
 
         jButton1.setText("Register");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -97,6 +102,26 @@ public class EmployeeRegistrationPanel extends javax.swing.JPanel {
                 .addContainerGap(110, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        if (com.crest.hrm.client.utils.FormValidator.isEmpty(jTextField1.getText())) {
+        javax.swing.JOptionPane.showMessageDialog(this, "First name is required");
+        return;
+    }
+
+    if (com.crest.hrm.client.utils.FormValidator.isEmpty(jTextField2.getText())) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Last name is required");
+        return;
+    }
+
+    if (com.crest.hrm.client.utils.FormValidator.isEmpty(jTextField3.getText())) {
+        javax.swing.JOptionPane.showMessageDialog(this, "IC/Passport number is required");
+        return;
+    }
+
+    // success message AFTER validation
+    javax.swing.JOptionPane.showMessageDialog(this, "Employee registered successfully");
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

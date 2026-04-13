@@ -41,11 +41,7 @@ public class EmployeeUpdatePanel extends javax.swing.JPanel {
 
         jLabel2.setText("Phone Number");
 
-        jTextField1.setText("jTextField1");
-
         jLabel3.setText("Address");
-
-        jTextField2.setText("jTextField2");
 
         jLabel4.setText("Family Details");
 
@@ -54,6 +50,11 @@ public class EmployeeUpdatePanel extends javax.swing.JPanel {
         jScrollPane1.setViewportView(jTextArea1);
 
         jButton1.setText("Update");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -108,6 +109,25 @@ public class EmployeeUpdatePanel extends javax.swing.JPanel {
                 .addContainerGap(53, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        if (com.crest.hrm.client.utils.FormValidator.isEmpty(jTextField1.getText())) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Phone number is required");
+        return;
+    }
+
+    if (com.crest.hrm.client.utils.FormValidator.isEmpty(jTextField2.getText())) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Address is required");
+        return;
+    }
+
+    if (com.crest.hrm.client.utils.FormValidator.isEmpty(jTextArea1.getText())) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Family details are required");
+        return;
+    }
+
+    javax.swing.JOptionPane.showMessageDialog(this, "Employee updated successfully");
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

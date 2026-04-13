@@ -121,7 +121,31 @@ public class LeaveApplicationPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        if (jComboBox1.getSelectedItem() == null) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Please select a leave type");
+        return;
+    }
+
+    if (com.crest.hrm.client.utils.FormValidator.isEmpty(jTextField1.getText())) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Start date is required");
+        return;
+    }
+
+    if (com.crest.hrm.client.utils.FormValidator.isEmpty(jTextField2.getText())) {
+        javax.swing.JOptionPane.showMessageDialog(this, "End date is required");
+        return;
+    }
+
+    if (com.crest.hrm.client.utils.FormValidator.isEmpty(jTextArea1.getText())) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Leave reason is required");
+        return;
+    }
+
+    javax.swing.JOptionPane.showMessageDialog(this, "Leave application submitted successfully");
+
+    jTextField1.setText("");
+    jTextField2.setText("");
+    jTextArea1.setText("");
     }//GEN-LAST:event_jButton1ActionPerformed
 
 
