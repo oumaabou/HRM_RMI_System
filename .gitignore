@@ -8,4 +8,13 @@
 /HRM-Common/HRM-Common2/nbproject/private/
 /HRM-Common/HRM-Server/nbproject/private/
 /HRM-Common/HRM-Client/nbproject/private/
+<<<<<<< Updated upstream
 /HRM-Client/build/
+=======
+/HRM-Common/HRM-Common2/build/
+/HRM-Common/HRM-Common2/dist/
+/HRM-Common/HRM-Client/build/
+/HRM-Common/HRM-Server/build/
+/HRM-Common/HRM-Client/dist/
+/HRM-Common/HRM-Server/dist/
+>>>>>>> Stashed changes

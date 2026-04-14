@@ -1,4 +1,4 @@
-package hrm.server;
+package com.crest.hrm.server.faulttolerance;
 
 import java.io.FileWriter;
 import java.time.LocalDateTime;

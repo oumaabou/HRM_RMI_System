@@ -1,4 +1,4 @@
-package hrm.server;
+package com.crest.hrm.server.faulttolerance;
 
 public class HeartbeatMonitor extends Thread {
 
