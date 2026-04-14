@@ -1,4 +1,4 @@
-package hrm.server;
+package com.crest.hrm.server.security;
 
 public class SSLConfig {
 
