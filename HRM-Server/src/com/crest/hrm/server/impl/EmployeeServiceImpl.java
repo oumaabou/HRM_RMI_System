@@ -183,7 +183,7 @@ public class EmployeeServiceImpl extends UnicastRemoteObject implements Employee
                     employeeId,
                     year,
                     daysRequested,
-                    application.getLeaveType().toString()
+                    application.getLeaveType().name()
             );
 
             if (!sufficient) {

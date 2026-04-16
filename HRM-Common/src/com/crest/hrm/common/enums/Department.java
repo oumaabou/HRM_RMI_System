@@ -14,7 +14,7 @@ public enum Department {
     FINANCE("Finance"),
     OPERATIONS("Operations"),
     MARKETING("Marketing"),
-    ADMINISTRATION("Administration");
+    ADMINISTRATION("Administration"), IT("IT");
     private final String displayName;
     Department(String displayName) {
         this.displayName = displayName;

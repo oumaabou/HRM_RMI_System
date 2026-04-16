@@ -124,7 +124,6 @@ public class HRServiceImpl extends UnicastRemoteObject implements HRService {
 
             if (approved) {
                 LocalDate start = leave.getStartDate();
-                LocalDate end = leave.getEndDate();
                 int year = start.getYear();
                 double daysUsed = leave.getTotalDays();
 
@@ -132,7 +131,7 @@ public class HRServiceImpl extends UnicastRemoteObject implements HRService {
                         leave.getEmployeeId(),
                         year,
                         daysUsed,
-                        leave.getLeaveType().toString()
+                        leave.getLeaveType().name()   // ✅ FIXED HERE
                 );
             }
 
@@ -142,6 +141,15 @@ public class HRServiceImpl extends UnicastRemoteObject implements HRService {
             throw new RemoteException("Invalid leave ID or HR staff ID format", e);
         } catch (SQLException e) {
             throw new RemoteException("Database error while reviewing leave application", e);
+        }
+    }
+
+    @Override
+    public List<LeaveApplication> getPendingLeaves() throws RemoteException {
+        try {
+            return leaveDAO.findPendingLeaves();
+        } catch (SQLException e) {
+            throw new RemoteException("Database error while retrieving pending leave applications", e);
         }
     }
 }

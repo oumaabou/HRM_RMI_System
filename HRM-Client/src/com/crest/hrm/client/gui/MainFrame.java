@@ -23,6 +23,9 @@ public class MainFrame extends javax.swing.JFrame {
      */
 public MainFrame() {
     initComponents();
+    
+    setSize(1000, 700);
+    setLocationRelativeTo(null);
 
     cardLayout = new java.awt.CardLayout();
     mainPanel.setLayout(cardLayout);

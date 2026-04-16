@@ -1,8 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package com.crest.hrm.client.gui.panels;
+
+import com.crest.hrm.client.rmi.RMIConnectionManager;
+import com.crest.hrm.common.interfaces.HRService;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -105,22 +105,53 @@ public class EmployeeRegistrationPanel extends javax.swing.JPanel {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (com.crest.hrm.client.utils.FormValidator.isEmpty(jTextField1.getText())) {
-        javax.swing.JOptionPane.showMessageDialog(this, "First name is required");
+        JOptionPane.showMessageDialog(this, "First name is required");
         return;
     }
 
     if (com.crest.hrm.client.utils.FormValidator.isEmpty(jTextField2.getText())) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Last name is required");
+        JOptionPane.showMessageDialog(this, "Last name is required");
         return;
     }
 
     if (com.crest.hrm.client.utils.FormValidator.isEmpty(jTextField3.getText())) {
-        javax.swing.JOptionPane.showMessageDialog(this, "IC/Passport number is required");
+        JOptionPane.showMessageDialog(this, "IC/Passport number is required");
         return;
     }
 
-    // success message AFTER validation
-    javax.swing.JOptionPane.showMessageDialog(this, "Employee registered successfully");
+    try {
+        String firstName = jTextField1.getText().trim();
+        String lastName = jTextField2.getText().trim();
+        String icNumber = jTextField3.getText().trim();
+
+        com.crest.hrm.common.models.Employee employee = new com.crest.hrm.common.models.Employee();
+
+        employee.setFirstName(firstName);
+        employee.setLastName(lastName);
+        employee.setIcNumber(icNumber);
+        employee.setEmail(firstName + "@example.com");
+        employee.setPhoneNumber("0000000000");
+        employee.setAddress("N/A");
+        employee.setGender("Not Specified");
+        employee.setDepartment(com.crest.hrm.common.enums.Department.IT);
+        employee.setRole(com.crest.hrm.common.enums.UserRole.EMPLOYEE);
+        employee.setDateJoined(java.time.LocalDate.now());
+        employee.setUsername(firstName + "_" + icNumber);
+        employee.setPasswordHash("12345");
+        employee.setIsActive(true);
+
+        HRService hrService = RMIConnectionManager.getHRService();
+        hrService.registerEmployee(employee);
+
+        JOptionPane.showMessageDialog(this, "Employee registered successfully");
+
+        jTextField1.setText("");
+        jTextField2.setText("");
+        jTextField3.setText("");
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Registration failed: " + e.getMessage());
+    }
     }//GEN-LAST:event_jButton1ActionPerformed
 
 

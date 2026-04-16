@@ -37,6 +37,7 @@ public interface HRService extends Remote {
      * @throws RemoteException if a network/RMI error occurs
      */
     List<Employee> getAllEmployees() throws RemoteException;
+    List<LeaveApplication> getPendingLeaves() throws RemoteException;
     /**
      * Retrieves an employee by their unique ID.
      *
