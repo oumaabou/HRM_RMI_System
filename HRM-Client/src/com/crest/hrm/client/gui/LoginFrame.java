@@ -99,42 +99,50 @@ public class LoginFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-   String username = jTextField1.getText();
-    String password = new String(jPasswordField1.getPassword());
+        String username = jTextField1.getText();
+        String password = new String(jPasswordField1.getPassword());
 
-    if (com.crest.hrm.client.utils.FormValidator.isEmpty(username)) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Username is required");
-        return;
-    }
+        if (com.crest.hrm.client.utils.FormValidator.isEmpty(username)) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Username is required");
+            return;
+        }
 
-    if (com.crest.hrm.client.utils.FormValidator.isEmpty(password)) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Password is required");
-        return;
-    }
+        if (com.crest.hrm.client.utils.FormValidator.isEmpty(password)) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Password is required");
+            return;
+        }
 
-    try {
-        java.rmi.registry.Registry registry =
-            com.crest.hrm.client.rmi.RMIConnectionManager.getRegistry();
+        new Thread(() -> {
+            try {
+                java.rmi.registry.Registry registry =
+                    com.crest.hrm.client.rmi.RMIConnectionManager.getRegistry();
 
-        com.crest.hrm.common.interfaces.AuthService authService =
-            (com.crest.hrm.common.interfaces.AuthService)
-            registry.lookup("AuthService");
+                com.crest.hrm.common.interfaces.AuthService authService =
+                    (com.crest.hrm.common.interfaces.AuthService)
+                    registry.lookup("AuthService");
 
-        com.crest.hrm.common.models.Employee employee =
-            authService.login(username, password);
+                com.crest.hrm.common.models.Employee employee =
+                    authService.login(username, password);
 
-        com.crest.hrm.client.session.UserSession.username = username;
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    com.crest.hrm.client.session.UserSession.username = username;
 
-        javax.swing.JOptionPane.showMessageDialog(this, "Login successful");
+                    javax.swing.JOptionPane.showMessageDialog(this, "Login successful");
 
-        new MainFrame().setVisible(true);
-        this.dispose();
+                    new MainFrame().setVisible(true);
+                    this.dispose();
+                });
 
-    } catch (com.crest.hrm.common.exceptions.AuthenticationException ex) {
-        javax.swing.JOptionPane.showMessageDialog(this, ex.getMessage());
-    } catch (Exception ex) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Connection error: " + ex.getMessage());
-    }
+            } catch (com.crest.hrm.common.exceptions.AuthenticationException ex) {
+                javax.swing.SwingUtilities.invokeLater(() ->
+                    javax.swing.JOptionPane.showMessageDialog(this, ex.getMessage())
+                );
+            } catch (Exception ex) {
+                javax.swing.SwingUtilities.invokeLater(() ->
+                    javax.swing.JOptionPane.showMessageDialog(this, "Connection error: " + ex.getMessage())
+                );
+            }
+        }).start();
 
     }//GEN-LAST:event_jButton1ActionPerformed
 

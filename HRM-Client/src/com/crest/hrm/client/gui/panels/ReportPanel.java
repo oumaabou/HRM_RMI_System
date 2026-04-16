@@ -119,44 +119,57 @@ public class ReportPanel extends javax.swing.JPanel {
             return;
         }
 
+        final String empId = jTextField2.getText().trim();
+        final String yearText = jTextField1.getText().trim();
+
         try {
-            String empId = jTextField2.getText().trim();
-            int year = Integer.parseInt(jTextField1.getText().trim());
-
-            com.crest.hrm.common.interfaces.HRService service =
-                    com.crest.hrm.client.rmi.RMIConnectionManager.getHRService();
-
-            java.util.List<com.crest.hrm.common.models.LeaveApplication> report =
-                    service.generateYearlyLeaveReport(empId, year);
-
-            javax.swing.table.DefaultTableModel model =
-                    new javax.swing.table.DefaultTableModel(
-                            new Object[][] {},
-                            new String[] {"Leave ID", "Type", "Start Date", "End Date", "Total Days", "Status"}
-                    );
-
-            for (com.crest.hrm.common.models.LeaveApplication leave : report) {
-                model.addRow(new Object[] {
-                    leave.getLeaveId(),
-                    leave.getLeaveType(),
-                    leave.getStartDate(),
-                    leave.getEndDate(),
-                    leave.getTotalDays(),
-                    leave.getStatus()
-                });
-            }
-
-            jTable1.setModel(model);
-
-            if (report.isEmpty()) {
-                javax.swing.JOptionPane.showMessageDialog(this, "No report data found");
-            }
-
+            Integer.parseInt(yearText);
         } catch (NumberFormatException e) {
             javax.swing.JOptionPane.showMessageDialog(this, "Year must be a number");
-        } catch (Exception e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            return;
         }
+
+        new Thread(() -> {
+            try {
+                int year = Integer.parseInt(yearText);
+
+                com.crest.hrm.common.interfaces.HRService service =
+                        com.crest.hrm.client.rmi.RMIConnectionManager.getHRService();
+
+                java.util.List<com.crest.hrm.common.models.LeaveApplication> report =
+                        service.generateYearlyLeaveReport(empId, year);
+
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    javax.swing.table.DefaultTableModel model =
+                            new javax.swing.table.DefaultTableModel(
+                                    new Object[][] {},
+                                    new String[] {"Leave ID", "Type", "Start Date", "End Date", "Total Days", "Status"}
+                            );
+
+                    for (com.crest.hrm.common.models.LeaveApplication leave : report) {
+                        model.addRow(new Object[] {
+                            leave.getLeaveId(),
+                            leave.getLeaveType(),
+                            leave.getStartDate(),
+                            leave.getEndDate(),
+                            leave.getTotalDays(),
+                            leave.getStatus()
+                        });
+                    }
+
+                    jTable1.setModel(model);
+
+                    if (report.isEmpty()) {
+                        javax.swing.JOptionPane.showMessageDialog(this, "No report data found");
+                    }
+                });
+
+            } catch (Exception e) {
+                javax.swing.SwingUtilities.invokeLater(() ->
+                    javax.swing.JOptionPane.showMessageDialog(this, "Error: " + e.getMessage())
+                );
+            }
+        }).start();
     }//GEN-LAST:event_jButton1ActionPerformed
 
 
