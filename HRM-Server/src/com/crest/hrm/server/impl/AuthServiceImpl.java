@@ -20,7 +20,11 @@ public class AuthServiceImpl extends UnicastRemoteObject implements AuthService 
     private static final Map<String, Integer> activeSessions = new HashMap<>();
 
     public AuthServiceImpl() throws RemoteException {
-        super();
+        super(
+    0,
+    new javax.rmi.ssl.SslRMIClientSocketFactory(),
+    new javax.rmi.ssl.SslRMIServerSocketFactory()
+);
         this.employeeDAO = new EmployeeDAOImpl();
     }
 
