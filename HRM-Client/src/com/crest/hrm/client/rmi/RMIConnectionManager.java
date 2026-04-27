@@ -1,5 +1,6 @@
 package com.crest.hrm.client.rmi;
 
+import com.crest.hrm.client.utils.SSLUtils;
 import com.crest.hrm.common.interfaces.AuthService;
 import com.crest.hrm.common.interfaces.EmployeeService;
 import com.crest.hrm.common.interfaces.HRService;
@@ -14,15 +15,15 @@ public class RMIConnectionManager {
     private static HRService hrService;
     private static EmployeeService employeeService;
 
-    private static final String SERVER_HOST = "localhost"; // Change to server LAN IP if connecting remotely e.g. "192.168.1.x"
+    private static final String SERVER_HOST = "10.214.238.151"; // change to server LAN IP
     private static final int SERVER_PORT = 1099;
     private static final int MAX_RETRIES = 3;
     private static final long RETRY_DELAY_MS = 2000;
 
-    // Configure SSL truststore before any RMI connection is made
     static {
-        System.setProperty("javax.net.ssl.trustStore", "config/client.truststore");
-        System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
+        // Disable SSL certificate validation before any RMI connection is made.
+        // This allows the client to connect regardless of the server's IP address.
+        SSLUtils.disableHostnameVerification();
     }
 
     /**
@@ -36,21 +37,19 @@ public class RMIConnectionManager {
                 try {
                     System.out.println("Connecting to RMI registry (attempt " + attempt + " of " + MAX_RETRIES + ")");
 
-                    // Must use SslRMIClientSocketFactory to match the SSL registry on the server
                     registry = LocateRegistry.getRegistry(
                             SERVER_HOST,
                             SERVER_PORT,
                             new SslRMIClientSocketFactory()
                     );
 
-                    // Test the connection
                     registry.list();
                     System.out.println("Connected to RMI registry successfully");
                     return registry;
 
                 } catch (Exception e) {
                     lastException = e;
-                    registry = null; // clear so next attempt starts fresh
+                    registry = null;
                     System.out.println("Connection attempt " + attempt + " failed: " + e.getMessage());
 
                     if (attempt < MAX_RETRIES) {
