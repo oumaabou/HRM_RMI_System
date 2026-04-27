@@ -5,6 +5,7 @@ import com.crest.hrm.common.interfaces.EmployeeService;
 import com.crest.hrm.common.interfaces.HRService;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import javax.rmi.ssl.SslRMIClientSocketFactory;
 
 public class RMIConnectionManager {
 
@@ -12,29 +13,46 @@ public class RMIConnectionManager {
     private static AuthService authService;
     private static HRService hrService;
     private static EmployeeService employeeService;
-    
+
+    private static final String SERVER_HOST = "localhost"; // Change to server LAN IP if connecting remotely e.g. "192.168.1.x"
+    private static final int SERVER_PORT = 1099;
     private static final int MAX_RETRIES = 3;
     private static final long RETRY_DELAY_MS = 2000;
 
+    // Configure SSL truststore before any RMI connection is made
+    static {
+        System.setProperty("javax.net.ssl.trustStore", "config/client.truststore");
+        System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
+    }
+
     /**
-     * Get RMI registry with automatic retry on failure
+     * Get RMI registry with SSL socket factory and automatic retry on failure
      */
     public static Registry getRegistry() throws Exception {
         if (registry == null) {
             Exception lastException = null;
-            
+
             for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
                 try {
                     System.out.println("Connecting to RMI registry (attempt " + attempt + " of " + MAX_RETRIES + ")");
-                    registry = LocateRegistry.getRegistry("localhost", 1099);
+
+                    // Must use SslRMIClientSocketFactory to match the SSL registry on the server
+                    registry = LocateRegistry.getRegistry(
+                            SERVER_HOST,
+                            SERVER_PORT,
+                            new SslRMIClientSocketFactory()
+                    );
+
                     // Test the connection
                     registry.list();
                     System.out.println("Connected to RMI registry successfully");
                     return registry;
+
                 } catch (Exception e) {
                     lastException = e;
+                    registry = null; // clear so next attempt starts fresh
                     System.out.println("Connection attempt " + attempt + " failed: " + e.getMessage());
-                    
+
                     if (attempt < MAX_RETRIES) {
                         try {
                             Thread.sleep(RETRY_DELAY_MS);
@@ -45,7 +63,7 @@ public class RMIConnectionManager {
                     }
                 }
             }
-            
+
             throw new Exception("Failed to connect to RMI registry after " + MAX_RETRIES + " attempts", lastException);
         }
         return registry;
@@ -83,7 +101,7 @@ public class RMIConnectionManager {
         }
         return employeeService;
     }
-    
+
     /**
      * Reset all cached connections (used when reconnecting after connection loss)
      */
@@ -94,13 +112,17 @@ public class RMIConnectionManager {
         employeeService = null;
         System.out.println("Connection cache cleared. Will reconnect on next request.");
     }
-    
+
     /**
      * Check if server is currently reachable
      */
     public static boolean isServerReachable() {
         try {
-            Registry testRegistry = LocateRegistry.getRegistry("localhost", 1099);
+            Registry testRegistry = LocateRegistry.getRegistry(
+                    SERVER_HOST,
+                    SERVER_PORT,
+                    new SslRMIClientSocketFactory()
+            );
             testRegistry.list();
             return true;
         } catch (Exception e) {

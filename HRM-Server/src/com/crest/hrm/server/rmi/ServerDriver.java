@@ -6,6 +6,7 @@ import com.crest.hrm.server.impl.HRServiceImpl;
 import com.crest.hrm.server.security.SSLConfig;
 import com.crest.hrm.server.security.SSLContextFactory;
 import java.rmi.registry.Registry;
+import java.net.InetAddress;
 
 public class ServerDriver {
 
@@ -14,6 +15,17 @@ public class ServerDriver {
         System.out.println("Starting Secure HRM RMI Server...");
 
         try {
+            // MUST be set before SSL config and registry start
+            // This tells RMI stubs to advertise the correct LAN IP to clients
+            // Change "192.168.1.x" to this machine's actual LAN IP
+            String hostname = System.getProperty("java.rmi.server.hostname");
+            if (hostname == null || hostname.isEmpty()) {
+                // Auto-detect LAN IP as fallback
+                hostname = InetAddress.getLocalHost().getHostAddress();
+                System.setProperty("java.rmi.server.hostname", hostname);
+            }
+            System.out.println("RMI server hostname set to: " + hostname);
+
             SSLConfig.configure();
             SSLContextFactory.configureSSL();
 
