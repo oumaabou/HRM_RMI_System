@@ -9,11 +9,10 @@ public class SslRMIClientSocketFactory implements RMIClientSocketFactory, Serial
 
     private static final long serialVersionUID = 1L;
 
-    private final javax.rmi.ssl.SslRMIClientSocketFactory delegate =
-            new javax.rmi.ssl.SslRMIClientSocketFactory();
-
     @Override
     public Socket createSocket(String host, int port) throws IOException {
-        return delegate.createSocket(host, port);
+        // Create fresh instance every time instead of reusing a cached delegate.
+        // This ensures SSL properties set via VM options are always picked up.
+        return new javax.rmi.ssl.SslRMIClientSocketFactory().createSocket(host, port);
     }
 }

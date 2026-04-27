@@ -6,12 +6,10 @@ import java.time.LocalDateTime;
 public class TransactionLogger {
 
     public static void log(String message) {
-        try {
-            FileWriter writer = new FileWriter("transactions.txt", true);
+        try (FileWriter writer = new FileWriter("transactions.log", true)) {
             writer.write(LocalDateTime.now() + " - " + message + "\n");
-            writer.close();
         } catch (Exception e) {
-            System.out.println("Log error");
+            System.out.println("Log error: " + e.getMessage());
         }
     }
 }
