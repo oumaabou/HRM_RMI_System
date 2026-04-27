@@ -1,12 +1,12 @@
 package com.crest.hrm.client.rmi;
 
 import com.crest.hrm.client.utils.SSLUtils;
+import com.crest.hrm.client.utils.TrustAllSslClientSocketFactory;
 import com.crest.hrm.common.interfaces.AuthService;
 import com.crest.hrm.common.interfaces.EmployeeService;
 import com.crest.hrm.common.interfaces.HRService;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import javax.rmi.ssl.SslRMIClientSocketFactory;
 
 public class RMIConnectionManager {
 
@@ -21,13 +21,12 @@ public class RMIConnectionManager {
     private static final long RETRY_DELAY_MS = 2000;
 
     static {
-        // Disable SSL certificate validation before any RMI connection is made.
-        // This allows the client to connect regardless of the server's IP address.
+        // Triggers SSLUtils static block — disables cert validation before any connection
         SSLUtils.disableHostnameVerification();
     }
 
     /**
-     * Get RMI registry with SSL socket factory and automatic retry on failure
+     * Get RMI registry using trust-all SSL socket factory
      */
     public static Registry getRegistry() throws Exception {
         if (registry == null) {
@@ -37,10 +36,12 @@ public class RMIConnectionManager {
                 try {
                     System.out.println("Connecting to RMI registry (attempt " + attempt + " of " + MAX_RETRIES + ")");
 
+                    // Use TrustAllSslClientSocketFactory instead of SslRMIClientSocketFactory
+                    // This uses our trust-all SSLContext directly, bypassing JVM cert validation
                     registry = LocateRegistry.getRegistry(
                             SERVER_HOST,
                             SERVER_PORT,
-                            new SslRMIClientSocketFactory()
+                            new TrustAllSslClientSocketFactory()
                     );
 
                     registry.list();
@@ -102,7 +103,7 @@ public class RMIConnectionManager {
     }
 
     /**
-     * Reset all cached connections (used when reconnecting after connection loss)
+     * Reset all cached connections
      */
     public static void resetConnection() {
         registry = null;
@@ -120,7 +121,7 @@ public class RMIConnectionManager {
             Registry testRegistry = LocateRegistry.getRegistry(
                     SERVER_HOST,
                     SERVER_PORT,
-                    new SslRMIClientSocketFactory()
+                    new TrustAllSslClientSocketFactory()
             );
             testRegistry.list();
             return true;
