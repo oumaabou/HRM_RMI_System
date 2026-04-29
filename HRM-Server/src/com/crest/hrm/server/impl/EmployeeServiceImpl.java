@@ -27,7 +27,11 @@ public class EmployeeServiceImpl extends UnicastRemoteObject implements Employee
     private final LeaveDAO leaveDAO;
 
     public EmployeeServiceImpl() throws RemoteException {
-        super();
+        super(
+    0,
+    new javax.rmi.ssl.SslRMIClientSocketFactory(),
+    new javax.rmi.ssl.SslRMIServerSocketFactory()
+);
         this.employeeDAO = new EmployeeDAOImpl();
         this.familyDAO = new FamilyDAOImpl();
         this.leaveDAO = new LeaveDAOImpl();

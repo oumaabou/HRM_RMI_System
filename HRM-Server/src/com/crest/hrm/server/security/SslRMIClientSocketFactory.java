@@ -1,13 +1,18 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.crest.hrm.server.security;
 
-/**
- *
- * @author user
- */
-public class SslRMIClientSocketFactory {
-    
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.Socket;
+import java.rmi.server.RMIClientSocketFactory;
+
+public class SslRMIClientSocketFactory implements RMIClientSocketFactory, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Socket createSocket(String host, int port) throws IOException {
+        // Create fresh instance every time instead of reusing a cached delegate.
+        // This ensures SSL properties set via VM options are always picked up.
+        return new javax.rmi.ssl.SslRMIClientSocketFactory().createSocket(host, port);
+    }
 }

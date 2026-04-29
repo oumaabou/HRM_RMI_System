@@ -5,6 +5,7 @@ import com.crest.hrm.common.interfaces.AuthService;
 import com.crest.hrm.common.models.Employee;
 import com.crest.hrm.server.dao.EmployeeDAO;
 import com.crest.hrm.server.dao.impl.EmployeeDAOImpl;
+import com.crest.hrm.server.security.PasswordEncryption;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -19,7 +20,11 @@ public class AuthServiceImpl extends UnicastRemoteObject implements AuthService 
     private static final Map<String, Integer> activeSessions = new HashMap<>();
 
     public AuthServiceImpl() throws RemoteException {
-        super();
+        super(
+    0,
+    new javax.rmi.ssl.SslRMIClientSocketFactory(),
+    new javax.rmi.ssl.SslRMIServerSocketFactory()
+);
         this.employeeDAO = new EmployeeDAOImpl();
     }
 
@@ -34,9 +39,9 @@ public class AuthServiceImpl extends UnicastRemoteObject implements AuthService 
                 throw new AuthenticationException("Invalid username or password");
             }
 
-            // Compare the password entered by user with stored password hash
-            // For now, direct comparison is used because sample data appears simple.
-            if (employee.getPasswordHash() == null || !employee.getPasswordHash().equals(password)) {
+            // Verify password using SHA-256 hashing
+            if (employee.getPasswordHash() == null || 
+                !PasswordEncryption.verifyPassword(password, employee.getPasswordHash())) {
                 throw new AuthenticationException("Invalid username or password");
             }
 

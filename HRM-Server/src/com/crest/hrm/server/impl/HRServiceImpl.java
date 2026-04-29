@@ -22,7 +22,11 @@ public class HRServiceImpl extends UnicastRemoteObject implements HRService {
     private final LeaveDAO leaveDAO;
 
     public HRServiceImpl() throws RemoteException {
-        super();
+        super(
+    0,
+    new javax.rmi.ssl.SslRMIClientSocketFactory(),
+    new javax.rmi.ssl.SslRMIServerSocketFactory()
+);
         this.employeeDAO = new EmployeeDAOImpl();
         this.leaveDAO = new LeaveDAOImpl();
     }
