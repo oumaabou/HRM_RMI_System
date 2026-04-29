@@ -46,7 +46,6 @@ public class LeaveHistoryPanel extends javax.swing.JPanel {
                 "Leave ID", "Type", "Start Date", "End Date", "Days", "Status", "Reason"
             }
         ));
-        jTable1.setPreferredSize(new java.awt.Dimension(600, 0));
         jScrollPane1.setViewportView(jTable1);
 
         jLabel2.setFont(new java.awt.Font("Monospaced", 0, 12)); // NOI18N
@@ -102,8 +101,43 @@ public class LeaveHistoryPanel extends javax.swing.JPanel {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (com.crest.hrm.client.utils.FormValidator.isEmpty(jTextField1.getText())) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Employee ID is required");
-        return;
+            javax.swing.JOptionPane.showMessageDialog(this, "Employee ID is required");
+            return;
+        }
+
+        try {
+            String empId = jTextField1.getText().trim();
+
+            com.crest.hrm.common.interfaces.EmployeeService service =
+                    com.crest.hrm.client.rmi.RMIConnectionManager.getEmployeeService();
+
+            java.util.List<com.crest.hrm.common.models.LeaveApplication> history =
+                    service.viewLeaveHistory(empId);
+
+            javax.swing.table.DefaultTableModel model =
+                    (javax.swing.table.DefaultTableModel) jTable1.getModel();
+
+            model.setRowCount(0);
+
+            for (com.crest.hrm.common.models.LeaveApplication leave : history) {
+                model.addRow(new Object[] {
+                    leave.getLeaveId(),
+                    leave.getLeaveType(),
+                    leave.getStartDate(),
+                    leave.getEndDate(),
+                    leave.getTotalDays(),
+                    leave.getStatus(),
+                    leave.getReason()
+                });
+            }
+
+            if (history.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, "No leave history found");
+            }
+
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        }
     }
 
     try {

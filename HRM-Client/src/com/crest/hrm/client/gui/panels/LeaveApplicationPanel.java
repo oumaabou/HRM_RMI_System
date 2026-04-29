@@ -15,6 +15,25 @@ public class LeaveApplicationPanel extends javax.swing.JPanel {
      */
     public LeaveApplicationPanel() {
         initComponents();
+
+        jTextArea1.setLineWrap(true);
+        jTextArea1.setWrapStyleWord(true);
+
+        jTextArea1.setDocument(new javax.swing.text.PlainDocument() {
+            @Override
+            public void insertString(int offs, String str, javax.swing.text.AttributeSet a)
+                    throws javax.swing.text.BadLocationException {
+                if (str == null) {
+                    return;
+                }
+
+                if ((getLength() + str.length()) <= 200) {
+                    super.insertString(offs, str, a);
+                } else {
+                    javax.swing.JOptionPane.showMessageDialog(null, "Reason cannot exceed 200 characters");
+                }
+            }
+        });
     }
 
     /**

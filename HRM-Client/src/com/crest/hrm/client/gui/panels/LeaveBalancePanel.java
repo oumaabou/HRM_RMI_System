@@ -139,9 +139,9 @@ public class LeaveBalancePanel extends javax.swing.JPanel {
             return;
         }
 
-        jLabel2.setText("Annual Leave: " + balance.getAnnualRemaining());
-        jLabel3.setText("Medical Leave: " + balance.getSickRemaining());
-        jLabel4.setText("Emergency Leave: " + balance.getEmergencyRemaining());
+        jLabel2.setText("Annual Leave Remaining: " + balance.getAnnualRemaining());
+        jLabel3.setText("Sick Leave Remaining: " + balance.getSickRemaining());
+        jLabel4.setText("Emergency Leave Remaining: " + balance.getEmergencyRemaining());
 
     } catch (NumberFormatException e) {
         javax.swing.JOptionPane.showMessageDialog(this, "Year must be a number");
