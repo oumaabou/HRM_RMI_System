@@ -128,7 +128,7 @@ public class LoginFrame extends javax.swing.JFrame {
                     authService.login(username, password);
 
                 javax.swing.SwingUtilities.invokeLater(() -> {
-                    com.crest.hrm.client.session.UserSession.username = username;
+                    com.crest.hrm.client.session.UserSession.setCurrentUser(employee);
 
                     javax.swing.JOptionPane.showMessageDialog(this, "Login successful");
 
