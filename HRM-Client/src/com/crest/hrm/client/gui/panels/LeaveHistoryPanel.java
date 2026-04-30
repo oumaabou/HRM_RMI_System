@@ -104,21 +104,21 @@ public class LeaveHistoryPanel extends javax.swing.JPanel {
             javax.swing.JOptionPane.showMessageDialog(this, "Employee ID is required");
             return;
         }
-
+ 
         try {
             String empId = jTextField1.getText().trim();
-
+ 
             com.crest.hrm.common.interfaces.EmployeeService service =
                     com.crest.hrm.client.rmi.RMIConnectionManager.getEmployeeService();
-
+ 
             java.util.List<com.crest.hrm.common.models.LeaveApplication> history =
                     service.viewLeaveHistory(empId);
-
+ 
             javax.swing.table.DefaultTableModel model =
                     (javax.swing.table.DefaultTableModel) jTable1.getModel();
-
+ 
             model.setRowCount(0);
-
+ 
             for (com.crest.hrm.common.models.LeaveApplication leave : history) {
                 model.addRow(new Object[] {
                     leave.getLeaveId(),
@@ -130,51 +130,14 @@ public class LeaveHistoryPanel extends javax.swing.JPanel {
                     leave.getReason()
                 });
             }
-
+ 
             if (history.isEmpty()) {
                 javax.swing.JOptionPane.showMessageDialog(this, "No leave history found");
             }
-
+ 
         } catch (Exception e) {
             javax.swing.JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
-    }
-
-    try {
-        String empId = jTextField1.getText().trim();
-
-        com.crest.hrm.common.interfaces.EmployeeService service =
-                com.crest.hrm.client.rmi.RMIConnectionManager.getEmployeeService();
-
-        java.util.List<com.crest.hrm.common.models.LeaveApplication> history =
-                service.viewLeaveHistory(empId);
-
-        javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel(
-            new Object[][] {},
-            new String[] {"Leave ID", "Type", "Start Date", "End Date", "Days", "Status", "Reason"}
-        );
-
-        for (com.crest.hrm.common.models.LeaveApplication leave : history) {
-            model.addRow(new Object[] {
-                leave.getLeaveId(),
-                leave.getLeaveType(),
-                leave.getStartDate(),
-                leave.getEndDate(),
-                leave.getTotalDays(),
-                leave.getStatus(),
-                leave.getReason()
-            });
-        }
-
-        jTable1.setModel(model);
-
-        if (history.isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(this, "No leave history found");
-        }
-
-    } catch (Exception e) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
-    }
     }//GEN-LAST:event_jButton1ActionPerformed
 
 
